@@ -1,0 +1,2 @@
+Family	Baits	BaitsInfo	ThinnedBaits	HMM	Reference	Ath	RegEx	Motifs
+bHLH	bHLH_baits.fasta	bHLH_baits.txt	bHLH_baits_thinned.fasta	bhlh.hmm	-	bHLH_at.fasta	-	-
