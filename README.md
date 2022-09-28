@@ -12,13 +12,14 @@ bHLH sequences of all species (subfolder/archive)
 
 
 
-------
- TOOL
-------
+## Usage 
 
+```
 cd <PATH>/bHLH_annotator
-python3 family_annotator.py --subject <PATH> --out <OUTPUT>  
+python3 family_annotator.py --subject <PATH> --out <OUTPUT>
+```
 
+```
 Mandatory:
 --out           STR     Output folder
 --subject       STR     Subject file   | --subjectdir    STR     Subject dir
@@ -58,14 +59,13 @@ Optional:
 --neighbourdist FLOAT   Cutoff in neighbour identification 							[3]
 --minneighbours INT     Minimal number of bait neighbours for classification 			[0]
 --paralogdist   FLOAT   Distance cutoff in paralog maksing 							[10]
+```
 
-
--------------------
- FAMILY DEFINITION
--------------------
+## Family definition
 To use the annotator for a family, specific files have to be defined in family_info.csv. 
 The files refered to need to be placed in the 'data' folder.  
 
+```
 Mandatory:
 Family			Family name	
 Baits			File name of baits file
@@ -78,3 +78,4 @@ Reference		File name of reference file
 Ath				File name of Ath family members
 RegEx			File name of RegEx file for domain check
 Motifs			File name of motifs file for motif search
+```
