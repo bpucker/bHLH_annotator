@@ -34,6 +34,7 @@ Optional:
 --cdsinput      NONE    Changes expected input to CDS
 --keepnames     NONE    Prevents splitting of sequence names at first space
 --collapse      NONE    Reduces paralogs to one representative
+--filterdomain  NONE    Filters candidates by hmm motif -> only if HMM motif is defined in the info file
 
 --cpu           INT     Number of threads 												[4]
 --cpub          INT     Number of threads for BLASTp									[cpu]

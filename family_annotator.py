@@ -16,7 +16,7 @@ try:
 except ImportError:
 	pass
 
-__version__ = "v0.000"
+__version__ = "v0.1"
 
 #TODO: usage
 __usage__ = """
@@ -623,24 +623,37 @@ def split_into_ingroup_and_outgroup( tree_file, in_list, out_list, neighbour_cut
             for t2 in ref_gene_nodes:    #calculate distance to all other sequences in tree
                 path_distance = pdm.path_edge_count( t1, t2)
                 patr_distance = pdm.patristic_distance( t1, t2 )
-                path_distances.append( { 'key': t2.label, 'val': path_distance } )
+                path_distances.append( { "key": t2.label, "val": path_distance } )
                 patristic_distances.update( { t2.label: patr_distance } )
             in_counter = 0
             out_counter = 0
-            sorted_distances = sorted( path_distances, key=itemgetter('val') )
+            sorted_distances = sorted( path_distances, key=itemgetter("val") )
             for each in sorted_distances[ : min( [ len( path_distances ), neighbour_cutoff ] ) ]:
-                patr = patristic_distances[ each['key'] ]
+                patr = patristic_distances[ each["key"] ]
                 if patr < mean_factor_cutoff*my_mean_nearest_taxon_distance:    #exclude outliers on extremely long branches
-                    if each['key'] in in_list:    #check if smalles path_distances are to in- or outgroup baits
+                    if each["key"] in in_list:    #check if smalles path_distances are to in- or outgroup baits
                         in_counter += 1
                     else:
                         out_counter += 1
             if in_counter+out_counter > min_neighbour_cutoff:
-                results.update( { t1.label: { 'score': float( in_counter ) / ( in_counter + out_counter ), 'in': in_counter, 'out': out_counter } } )
+                results.update( { t1.label: { "score": float( in_counter ) / ( in_counter + out_counter ), "in": in_counter, "out": out_counter } } )
             else:
-                results.update( { t1.label: { 'score': 0.0, 'in': in_counter, 'out': out_counter } } )
+                results.update( { t1.label: { "score": 0.0, "in": in_counter, "out": out_counter } } )
             #score ranges from 0 (non-family member) to 1 (family member)
     return results
+
+
+def write_tree_symbol(df, field_labels, field_shapes, field_colors, output_file):
+    with open( output_file ,"w") as out: 
+        out.write( "\n".join(["DATASET_BINARY","SEPARATOR COMMA",
+         "DATASET_LABEL,label1",
+         "COLOR,#ff0000",
+         "\n"]))    
+        out.write("FIELD_SHAPES,%s\n" % (",".join(field_shapes)))
+        out.write("FIELD_LABELS,%s\n" % (",".join(field_labels)))
+        out.write("FIELD_COLORS,%s\n" % (",".join(field_colors)))
+        out.write("DATA\n" )    
+        out.write(df.to_csv(index=False,header=False,line_terminator="\n",sep=","))
 
 
 def member_group_assignment( ref_members, tree_file, member_candidates ):
@@ -837,24 +850,24 @@ def construct_fasta_file_w_repr_and_aths( ref_mems, new2ref_mapping_table, repr_
 def main( arguments ):
     """! @brief run everything """
       
-    output_folder = arguments[ arguments.index('--out')+1 ]
+    output_folder = arguments[ arguments.index("--out")+1 ]
     
     fam_definition_file = "family_info.csv"
     family_definition = pd.read_csv(fam_definition_file,sep="\t",index_col=0)
 
 #%%
-    if '--family' in arguments:
-        if ',' in arguments[ arguments.index('--family')+1 ]:
-            family = arguments[ arguments.index('--family')+1 ].split(',')
+    if "--family" in arguments:
+        if "," in arguments[ arguments.index("--family")+1 ]:
+            family = arguments[ arguments.index("--family")+1 ].split(",")
         else:
-            family = [arguments[ arguments.index('--family')+1 ]]
+            family = [arguments[ arguments.index("--family")+1 ]]
     else: 
-        family = ['bHLH']
+        family = ["bHLH"]
                    
-    if '--subject' in arguments:
-        raw_subject_files = [ arguments[ arguments.index('--subject')+1 ] ]
+    if "--subject" in arguments:
+        raw_subject_files = [ arguments[ arguments.index("--subject")+1 ] ]
     else:
-        subject_file_dir = arguments[ arguments.index('--subjectdir')+1 ]
+        subject_file_dir = arguments[ arguments.index("--subjectdir")+1 ]
         if not subject_file_dir[-1] == "/":
             subject_file_dir + "/"
         extensions = [ ".fasta", ".fa", ".fas", ".FASTA", ".FA", ".FAS", ".fna", ".FNA", ".cds", ".CDS", ".pep", ".PEP" ]
@@ -863,34 +876,32 @@ def main( arguments ):
             raw_subject_files += glob.glob( subject_file_dir + "*" + each )
         raw_subject_files = list( sorted( raw_subject_files ) )
    
-    
     # --- Search options --- # 
-    if '--search' in arguments:
-        search = arguments[ arguments.index('--search')+1 ]
+    if "--search" in arguments:
+        search = arguments[ arguments.index("--search")+1 ]
         if search not in [ "blast", "hmmer" ]:
             search = "blast"
     else:
         search = "blast"   
-    if '--mode_aln' in arguments:
-        mode_aln = arguments[ arguments.index('--mode_aln')+1 ]
+    if "--mode_aln" in arguments:
+        mode_aln = arguments[ arguments.index("--mode_aln")+1 ]
         if mode_aln not in [ "mafft", "muscle" ]:
             mode_aln = "muscle"
     else:
         mode_aln = "muscle"    
-    if '--mode_tree' in arguments:
-        mode_tree = arguments[ arguments.index('--mode_tree')+1 ]
+    if "--mode_tree" in arguments:
+        mode_tree = arguments[ arguments.index("--mode_tree")+1 ]
         if mode_tree not in [ "fasttree", "raxml" ]:
             mode_tree = "fasttree"
     else:
         mode_tree = "fasttree"
-    
-    
+       
     # --- Execution Options --- #
     if "--name" in arguments:
-        name = arguments[ arguments.index('--name')+1 ]
+        name = arguments[ arguments.index("--name")+1 ]
     else:
         name = ""
-    if '--cdsinput' in arguments:
+    if "--cdsinput" in arguments:
         cds_input = True
     else:
         cds_input = False   
@@ -898,96 +909,96 @@ def main( arguments ):
         trim_names = False
     else:
         trim_names = True
-    if '--collapse' in arguments:
+    if "--collapse" in arguments:
         collapse_mode = True
     else:
         collapse_mode = False
-
+    if "--filterdomain":
+        candidates_domain_filter = True
+    else:
+        candidates_domain_filter = False    
 
     # --- CPU usage --- #
-    if '--cpu' in arguments:
-        cpu = int( arguments[ arguments.index('--cpu')+1 ] )
+    if "--cpu" in arguments:
+        cpu = int( arguments[ arguments.index("--cpu")+1 ] )
     else:
         cpu = 4   
-    if '--cpub' in arguments:
-        cpub = int( arguments[ arguments.index('--cpub')+1 ] )
+    if "--cpub" in arguments:
+        cpub = int( arguments[ arguments.index("--cpub")+1 ] )
     else:
         cpub = cpu + 0
-    if '--cpur' in arguments:
-        cpur = int( arguments[ arguments.index('--cpur')+1 ] )
+    if "--cpur" in arguments:
+        cpur = int( arguments[ arguments.index("--cpur")+1 ] )
     else:
         cpur = cpu + 0
     
-
     # --- Tool paths --- #
-    if '--blastp' in arguments:
-        blastp = arguments[ arguments.index('--blastp')+1 ]
+    if "--blastp" in arguments:
+        blastp = arguments[ arguments.index("--blastp")+1 ]
     else:
         blastp = "blastp"
-    if '--makeblastdb' in arguments:
-        makeblastdb = arguments[ arguments.index('--makeblastdb')+1 ]
+    if "--makeblastdb" in arguments:
+        makeblastdb = arguments[ arguments.index("--makeblastdb")+1 ]
     else:
         makeblastdb = "makeblastdb"
-    if '--hmmsearch' in arguments:
-        hmmsearch = arguments[ arguments.index('--hmmsearch')+1 ]
+    if "--hmmsearch" in arguments:
+        hmmsearch = arguments[ arguments.index("--hmmsearch")+1 ]
     else:
         hmmsearch = "hmmsearch"
     if "--mafft" in arguments:
-        mafft = arguments[ arguments.index('--mafft')+1 ]
+        mafft = arguments[ arguments.index("--mafft")+1 ]
     else:
         mafft = "mafft"
     if "--muscle" in arguments:
-        muscle = arguments[ arguments.index('--muscle')+1 ]
+        muscle = arguments[ arguments.index("--muscle")+1 ]
     else:
         muscle = "muscle"
     if "--fasttree" in arguments:
-        fasttree = arguments[ arguments.index('--fasttree')+1 ]
+        fasttree = arguments[ arguments.index("--fasttree")+1 ]
     else:
         fasttree = "fasttree"
-    if '--raxml' in arguments:
-        raxml = arguments[ arguments.index('--raxml')+1 ]
+    if "--raxml" in arguments:
+        raxml = arguments[ arguments.index("--raxml")+1 ]
     else:
         raxml = "raxml"
-    
-    
+       
     # --- BLAST hit cutoffs --- #
     if "--simcutp" in arguments:
-        similarity_cutoff_p = float( arguments[ arguments.index('--simcutp')+1 ] )
+        similarity_cutoff_p = float( arguments[ arguments.index("--simcutp")+1 ] )
     else:
         similarity_cutoff_p=40.00
-    if '--poscutp' in arguments:
-        possibility_cutoff_p = int( arguments[ arguments.index('--poscutp')+1 ] )
+    if "--poscutp" in arguments:
+        possibility_cutoff_p = int( arguments[ arguments.index("--poscutp")+1 ] )
     else:
         possibility_cutoff_p=100
-    if '--lencutp' in arguments:
-        length_cutoff_p = int( arguments[ arguments.index('--lencutp')+1 ] )
+    if "--lencutp" in arguments:
+        length_cutoff_p = int( arguments[ arguments.index("--lencutp")+1 ] )
     else:
         length_cutoff_p=60      
-    if '--bitcutp' in arguments:
-        bitscore_p = int( arguments[ arguments.index('--bitcutp')+1 ] )
+    if "--bitcutp" in arguments:
+        bitscore_p = int( arguments[ arguments.index("--bitcutp")+1 ] )
     else:
         bitscore_p=60
     
-
     # --- Candidate cutoffs --- #
-    if '--minscore' in arguments:
-        min_score_cutoff = int( arguments[ arguments.index('--minscore')+1 ] )
+    if "--minscore" in arguments:
+        min_score_cutoff = int( arguments[ arguments.index("--minscore")+1 ] )
     else:
         min_score_cutoff=0.8    #minimal score for candidate to be considered as ingroup      
-    if '--numneighbours' in arguments:
-        neighbour_cutoff = int( arguments[ arguments.index('--numneighbours')+1 ] )
+    if "--numneighbours" in arguments:
+        neighbour_cutoff = int( arguments[ arguments.index("--numneighbours")+1 ] )
     else:
         neighbour_cutoff=30    #numbers of closest neighbour that is considered in ingroup/outgroup classification   
-    if '--neighbourdist' in arguments:
-        mean_factor_cutoff = float( arguments[ arguments.index('--neighbourdist')+1 ] )
+    if "--neighbourdist" in arguments:
+        mean_factor_cutoff = float( arguments[ arguments.index("--neighbourdist")+1 ] )
     else:
         mean_factor_cutoff=10.0    #X*average nearest neighbor distance  
     if "--minneighbours" in arguments:
-        min_neighbour_cutoff = int( arguments[ arguments.index('--minneighbours')+1 ] )
+        min_neighbour_cutoff = int( arguments[ arguments.index("--minneighbours")+1 ] )
     else:
         min_neighbour_cutoff = 0    #minimal number of valid bait sequences (ingroup+outgroup) in range - 1    
-    if '--paralogdist' in arguments:
-        dist_cutoff_factorB = float( arguments[ arguments.index('--paralogdist')+1 ] )
+    if "--paralogdist" in arguments:
+        dist_cutoff_factorB = float( arguments[ arguments.index("--paralogdist")+1 ] )
     else:
         dist_cutoff_factorB=10.0    #X*average nearest neighbour distance used as cutoff in the monophyletic tip masking
     
@@ -997,8 +1008,8 @@ def main( arguments ):
     if not os.path.exists( output_folder ):
         os.makedirs( output_folder )
  
-    if not ('Baits' in family_definition.columns and 'BaitsInfo' in family_definition.columns):    
-        sys.exit( "ERROR: Mandatory columns 'Baits' and/or 'BaitsInfo' are missing in information file: " + fam_definition_file )
+    if not ("Baits" in family_definition.columns and "BaitsInfo" in family_definition.columns):    
+        sys.exit( 'ERROR: Mandatory columns "Baits" and/or "BaitsInfo" are missing in information file: ' + fam_definition_file )
 #%% 
         
     # --- separated analyses for each family --- #
@@ -1012,49 +1023,48 @@ def main( arguments ):
         fam_bait_seq_file_all = "data/" + family_definition.loc[fam,"Baits"]
         fam_info_file = "data/" + family_definition.loc[fam,"BaitsInfo"] 
 
-
-        if 'ThinnedBaits' in family_definition.columns:
-            fam_bait_seq_file = family_definition.loc[fam,'ThinnedBaits']
+        if "ThinnedBaits" in family_definition.columns:
+            fam_bait_seq_file = family_definition.loc[fam,"ThinnedBaits"]
             fam_bait_seq_file = "data/" + fam_bait_seq_file  if len(fam_bait_seq_file ) > 1 else fam_bait_seq_file_all # to remove -          
         else:
             fam_bait_seq_file = fam_bait_seq_file_all
  
-        if search == "hmmer" and 'HMM' in family_definition.columns:
-            fam_bait_hmm = family_definition.loc[fam,'HMM']
+        if "HMM" in family_definition.columns:
+            fam_bait_hmm = family_definition.loc[fam,"HMM"]
             fam_bait_hmm  = "data/" + fam_bait_hmm  if len(fam_bait_hmm ) > 1 else "" # to remove -
         else:
-            fam_bait_hmm = ''    
+            fam_bait_hmm = ""    
  
-        if 'Reference' in family_definition.columns:
-            ref_file = family_definition.loc[fam,'Reference']
+        if "Reference" in family_definition.columns:
+            ref_file = family_definition.loc[fam,"Reference"]
             ref_file = "data/" + ref_file if len(ref_file) > 1 else "" # to remove -
         
-        if 'Ath' in family_definition.columns:      
-            fam_ath_file = family_definition.loc[fam,'Ath']
+        if "Ath" in family_definition.columns:      
+            fam_ath_file = family_definition.loc[fam,"Ath"]
             fam_ath_file  = "data/" + fam_ath_file  if len(fam_ath_file ) > 1 else "" # to remove -
         else:
-            fam_ath_file = ''
+            fam_ath_file = ""
         
-        if 'Motifs' in family_definition.columns:      
-            motif_file = family_definition.loc[fam,'Motifs']
+        if "Motifs" in family_definition.columns:      
+            motif_file = family_definition.loc[fam,"Motifs"]
             motif_file  = "data/" + motif_file if len(motif_file ) > 1 else "" # to remove -
         else:
-            motif_file = ''
+            motif_file = ""
         
     
         # --- separated analyses for each subject --- #           
-        fam_ID = '' if len(family)==1 else family   
+        fam_ID = "" if len(family)==1 else family   
         for jidx, raw_subject_file in enumerate( raw_subject_files ):    #use jidx to generate unique IDs for all jobs
             
             # --- prepare output folder for each job if there are multiple --- #   
             if len( raw_subject_files ) == 1:
                 job_output_folder = output_folder + fam_ID 
             else:
-                job_ID = raw_subject_file.split('/')[-1].split('.')[0]
-                job_output_folder = output_folder + fam_ID +'/' + str( jidx ).zfill(5) + "_" + job_ID + "/"
+                job_ID = raw_subject_file.split("/")[-1].split(".")[0]
+                job_output_folder = output_folder + fam_ID +"/" + str( jidx ).zfill(5) + "_" + job_ID + "/"
             
-            if not job_output_folder[-1] +'/':
-                job_output_folder = job_output_folder + '/' 
+            if not job_output_folder[-1] +"/":
+                job_output_folder = job_output_folder + "/" 
             
             if not os.path.exists( job_output_folder ):
                 os.makedirs( job_output_folder )
@@ -1128,8 +1138,15 @@ def main( arguments ):
             aln_input_file = job_output_folder + "02_alignment_input.fasta"
             aln_file = job_output_folder + "02_alignment_input.fasta.aln"
             cln_aln_file = job_output_folder + "02_alignment_input.fasta.aln.cln"
+            aln_hmmsearch_results_file = job_output_folder +"02_hmmsearch_results.txt"
             tree_file = tree_constructor( aln_input_file, aln_file, cln_aln_file, fam_bait_seq_file, candidate_file, job_output_folder, "02_", "", mode_aln, mode_tree, mafft, muscle, raxml, fasttree, cpur )
-                 
+                
+            if os.path.isfile( fam_bait_hmm ):
+                p = subprocess.Popen( args= hmmsearch + " --tblout " + aln_hmmsearch_results_file + " " + fam_bait_hmm + " " + aln_input_file + " > " + job_output_folder + "02_hmmsearch_waste.txt", shell=True )
+                p.communicate()
+                aln_hmmsearch_results = load_hmmsearch_results( aln_hmmsearch_results_file )
+            else:
+                aln_hmmsearch_results = {}
             
             # --- 02 analyze tree file --- #
             clean_members_file = result_folder + name + "02a_clean_%ss.pep.fasta" % (fam)
@@ -1139,34 +1156,75 @@ def main( arguments ):
                 sys.stdout.write( "Number of ingroup %s baits: " % (fam) + str( len( in_list ) ) + "\n" )
                 sys.stdout.write( "Number of outgroup %s baits: " % (fam) + str( len( out_list ) ) + "\n" )
                 sys.stdout.flush()
-                fam_classification = split_into_ingroup_and_outgroup( tree_file, in_list, out_list, neighbour_cutoff, mean_factor_cutoff, min_neighbour_cutoff )
-                #dictionary with subject IDs: values are in the range of 0 (non-family member) to 1 (family member)
                 
+                # dictionary with subject IDs: values are in the range of 0 (non-family member) to 1 (family member)
+                fam_classification = split_into_ingroup_and_outgroup( tree_file, in_list, out_list, neighbour_cutoff, mean_factor_cutoff, min_neighbour_cutoff )
+                        
+                # dictionary withs subject IDS: max blast scores and domain info
+                blast_results = pd.read_csv(seq_search_result_file, delimiter = "\t", header=None) # qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore   
+                candidates_max_blast_hits = {}
+                for c in fam_classification:
+                    member_results = blast_results[blast_results[1]==c]
+                    if len(aln_hmmsearch_results) == 0:
+                        hmmer = "-"
+                    else:
+                        hmmer = "yes" if subject_name_mapping_table[c] in aln_hmmsearch_results else "no"                    
+                    candidates_max_blast_hits.update({c:{"sim":member_results[2].max(), "length":member_results[3].max(), "bit":member_results[11].max(), "hmm":hmmer}})
+                                                  
                 with open( clean_members_file, "w" ) as out:
                     with open( tmp_result_table, "w" ) as out2:
-                        out2.write( "OriginalID\tCleanID\tScore\tIngroupMatches\tOutgroupMatches\n" )
+                        out2.write( "OriginalID\tCleanID\tHMMmotif\tScore\tIngroupMatches\tOutgroupMatches\tMaxSimilarity\tMaxLength\tMaxBitscore\n" )
                         candidate_order = list( sorted( fam_classification.keys() ) )
                         for candidate in candidate_order:
-                            if fam_classification[ candidate ]['score'] > min_score_cutoff:
-                                out.write( '>' + candidate + "\n" + subject_sequences[ candidate ] + "\n" )
+                            if fam_classification[ candidate ]["score"] > min_score_cutoff and ( candidate in aln_hmmsearch_results or not candidates_domain_filter):
+                                out.write( ">" + candidate + "\n" + subject_sequences[ candidate ] + "\n" )
                             out2.write( "\t".join( list( map( str, [subject_name_mapping_table[ candidate ],
                                                                     candidate,
-                                                                    fam_classification[ candidate ]['score'],
-                                                                    fam_classification[ candidate ]['in'],
-                                                                    fam_classification[ candidate ]['out']
+                                                                    candidates_max_blast_hits[ candidate ]["hmm"],
+                                                                    fam_classification[ candidate ]["score"],
+                                                                    fam_classification[ candidate ]["in"],
+                                                                    fam_classification[ candidate ]["out"],
+                                                                    candidates_max_blast_hits[ candidate ]["sim"],
+                                                                    candidates_max_blast_hits[ candidate ]["length"],
+                                                                    candidates_max_blast_hits[ candidate ]["bit"]
                                                                     ] ) ) ) + "\n" )
                 if cds_input:    #generate corresponding CDS clean member output file
                     cds_clean_members_file = clean_members_file.replace( ".pep.fasta", ".cds.fasta" )
                     with open( cds_clean_members_file, "w" ) as out:
                         for candidate in candidate_order:
-                            if fam_classification[ candidate ]['score'] > 0.5:
-                                out.write( '>' + candidate + "\n" + cds_subject_sequences[ candidate ] + "\n" )
+                            if fam_classification[ candidate ]["score"] > min_score_cutoff and ( candidate in aln_hmmsearch_results or not candidates_domain_filter):
+                                out.write( ">" + candidate + "\n" + cds_subject_sequences[ candidate ] + "\n" )
+            
+                # create tree dataset file in iTOL format 
+                #TODO: is it allowed?                
+                #outgroup - grey square #bcbcbc  1
+                #domain - blue star #3d85c6 3
+                # cnd_in red #f44336 2
+                # cnd_out -light green square #6aa84f 1               
+                row_list=[]
+                for bait in in_list:
+                    missing_domain = "-1" if (bait in aln_hmmsearch_results or len(aln_hmmsearch_results)==0) else "1"
+                    row_list.append( {"CleanID":bait,"missing_hmm_domain":missing_domain})
+                for bait in out_list:
+                    missing_domain = "-1" if (bait in aln_hmmsearch_results or len(aln_hmmsearch_results)==0) else "1"
+                    row_list.append( {"CleanID":bait,"bait_out":"1", "missing_hmm_domain":missing_domain})
+                for candidate in fam_classification:
+                    missing_domain = "-1" if (candidate in aln_hmmsearch_results or len(aln_hmmsearch_results)==0) else "1"
+                    is_ingroup = fam_classification[ candidate ]["score"] > min_score_cutoff and ( candidate in aln_hmmsearch_results or not candidates_domain_filter)
+                    cnd_in = "1" if is_ingroup else "-1"
+                    cnd_out = "1" if not is_ingroup else "-1"
+                    row_list.append({"CleanID":candidate, "cnd_in":cnd_in , "cnd_out":cnd_out,"missing_hmm_domain":missing_domain})
+                              
+                tree_dataset_file = job_output_folder + "02_tree_info_dataset.txt"
+                data = pd.DataFrame(row_list).fillna(value="-1").reindex(columns=["CleanID","missing_hmm_domain","bait_out","cnd_out","cnd_in"])
+                write_tree_symbol(data,data.columns.values[1:], ["3","1","1","2"],["#3d85c6","#bcbcbc","#6aa84f","#f44336",],tree_dataset_file)
+                       
             else:
                 fam_classification = load_fam_classification_from_file( tmp_result_table )
             clean_members = load_sequences( clean_members_file )
             if len( list( clean_members.keys() ) ) < 1:
                 sys.exit( "ERROR: no " + fam + "s detected." )
-                
+             
                 
             # --- 03 find closest reference --- #
             if len( ref_file ) > 0:    #only performed if reference file is provided
