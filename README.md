@@ -16,7 +16,7 @@ bHLH sequences of all species (subfolder/archive)
 
 ```
 cd <PATH>/bHLH_annotator
-python3 family_annotator.py --subject <PATH> --out <OUTPUT>
+python3 bHLH_annotator.py --subject <PATH> --out <OUTPUT>
 ```
 
 ```
@@ -34,11 +34,12 @@ Optional:
 --cdsinput      NONE    Changes expected input to CDS
 --keepnames     NONE    Prevents splitting of sequence names at first space
 --collapse      NONE    Reduces paralogs to one representative
---filterdomain  NONE    Filters candidates by hmm motif -> only if HMM motif is defined in the info file
+--parameter_graphs      NONE    Create graphs showing candidate distribution for variation of blast and classification parameters
 
 --cpu           INT     Number of threads 												[4]
+--cpumax         INT     Number of threads for in ingroup/outgroup classification      [cpu]
 --cpub          INT     Number of threads for BLASTp									[cpu]
---cpur          INT     Number of threads for RAxML										[cpu]
+--cpur          INT     Number of threads for alignment/tree construction				[cpu]
 					
 --blastp        STR     Path to blastp 													[blastp]
 --makeblastdb   STR     Path to makeblastdb 											[makeblastdb]
@@ -52,18 +53,21 @@ Optional:
 --bitcutp		INT		BLASTp bitscore cutoff											[60] 					
 --simcutp       FLOAT   BLASTp similarity cutoff 										[40.0]
 --poscutp       INT     Max number of BLASTp hits per bait 								[100]
---lencutp		INT     Min BLASTp alignment length 									[60]
+--lencutp		INT     Min BLASTp alignment length 									[80]
 
 	Candidate filtering settings:
---minscore		FLOAT	Minimal score to be considered as ingroup						[0.8]
---numneighbours INT     Neighbours to consider for classification 						[30]
---neighbourdist FLOAT   Cutoff in neighbour identification 							[3]
+--filterdomain  NONE    Filters candidates by hmm motif -> only if HMM motif is defined in the info file
+--minscore		FLOAT	Minimal score to be considered as ingroup						[0.5]
+--numneighbours INT     Neighbours to consider for classification 						[10]
+--neighbourdist FLOAT   Cutoff in neighbour identification 							[5.0]
 --minneighbours INT     Minimal number of bait neighbours for classification 			[0]
+--parallel    NONE      Parallelization at ingroup/outgroup classification
+--numprocesscandidates  INT Maximal number of candidates per parallel ingroup/outgroup classification  [200]
 --paralogdist   FLOAT   Distance cutoff in paralog maksing 							[10]
 ```
 
 ## Family definition
-To use the annotator for a family, specific files have to be defined in family_info.csv. 
+To use the annotator for a family, specific files have to be defined in bHLH_info.csv. 
 The files refered to need to be placed in the 'data' folder.  
 
 ```
@@ -77,6 +81,5 @@ ThinnedBaits	File name of reduced bait set file for tree construction, otherwise
 HMM				File name of HMM motif for hmmer search
 Reference		File name of reference file
 Ath				File name of Ath family members
-RegEx			File name of RegEx file for domain check
 Motifs			File name of motifs file for motif search
 ```
