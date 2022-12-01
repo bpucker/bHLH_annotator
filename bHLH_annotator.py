@@ -19,7 +19,7 @@ try:
 except ImportError:
 	pass
 
-__version__ = "v1.00"
+__version__ = "v1.01"
 __usage__ = """
                     python3 bHLH_annotator.py
                     --out <OUTPUT_DIR>
@@ -1171,6 +1171,22 @@ def analyse_bHLH_domain(binding_properties_file, domain_file,fin_aln_file, membe
                              
     return binding_properties_file
 
+
+def get_from_definition_file(clmn,family_definition, fam, fam_definition_file):
+    """! @brief gets value from column in definition file; warning, if the file path doesnt exist """
+    file = ""  
+    if clmn in family_definition.columns:
+        file = str(family_definition.loc[fam,clmn])     
+        if not os.path.isfile(file):
+
+           if os.path.isfile("data/" + file):
+                file = "data/" + file
+           else:
+                if len(file) > 1 :
+                    sys.stdout.write( 'WARNING: "' + clmn + '" file defined in ' + fam_definition_file  + " does not exist: "  + file + " \n")         
+                file = "" 
+    return file
+
 #%%
 
 
@@ -1345,41 +1361,32 @@ def main( arguments ):
     fam_definition_file = "bHLH_info.csv"
     family_definition = pd.read_csv(fam_definition_file,sep="\t",index_col=0)
     family_definition = family_definition.fillna('')
+    
     if not ("Baits" in family_definition.columns and "BaitsInfo" in family_definition.columns):    
-        sys.exit( 'ERROR: Mandatory columns "Baits" and/or "BaitsInfo" are missing in information file: ' + fam_definition_file )       
+        sys.exit( 'ERROR: Mandatory columns "Baits" and/or "BaitsInfo" are missing in ' + fam_definition_file + "\n" )       
     if not fam in family_definition.index: 
-        sys.exit( "ERROR: bHLH family not defined in definition file:" + fam + "\n" )
+        sys.exit( "ERROR: bHLH family not defined in " + fam_definition_file + "\n" )
        
-    fam_bait_seq_file_all = "data/" + str(family_definition.loc[fam,"Baits"])
-    fam_info_file = "data/" + str(family_definition.loc[fam,"BaitsInfo"]) 
-
-    if "ThinnedBaits" in family_definition.columns:
-        fam_bait_seq_file = str(family_definition.loc[fam,"ThinnedBaits"])
-        fam_bait_seq_file = "data/" + fam_bait_seq_file  if len(fam_bait_seq_file ) > 1 else fam_bait_seq_file_all # to remove -          
-    else:
+    #Baits
+    fam_bait_seq_file_all = get_from_definition_file("Baits", family_definition, fam, fam_definition_file)
+    if fam_bait_seq_file_all == "":
+        sys.exit( 'ERROR: "Baits" file must be defined for execution of annotator \n')  
+        
+    #BaitsInfo
+    fam_info_file = get_from_definition_file("BaitsInfo", family_definition, fam, fam_definition_file)
+    if fam_info_file == "":
+        sys.exit( 'ERROR: "BaitsInfo" file must be defined for execution of annotator \n') 
+    
+    #ThinnedBaits
+    fam_bait_seq_file  = get_from_definition_file("ThinnedBaits", family_definition, fam, fam_definition_file)
+    if fam_bait_seq_file  == "":
         fam_bait_seq_file = fam_bait_seq_file_all
- 
-    if "HMM" in family_definition.columns:
-        fam_bait_hmm = str(family_definition.loc[fam,"HMM"])
-        fam_bait_hmm  = "data/" + fam_bait_hmm  if len(fam_bait_hmm ) > 1 else "" # to remove -
-    else:
-        fam_bait_hmm = ""  
-
-    if "Reference" in family_definition.columns:
-        ref_file = str(family_definition.loc[fam,"Reference"])
-        ref_file = "data/" + ref_file if len(ref_file) > 1 else "" # to remove -
     
-    if "Ath" in family_definition.columns:      
-        fam_ath_file = str(family_definition.loc[fam,"Ath"])
-        fam_ath_file  = "data/" + fam_ath_file  if len(fam_ath_file ) > 1 else "" # to remove -
-    else:
-        fam_ath_file = ""
-    
-    if "Motifs" in family_definition.columns:      
-        motif_file = str(family_definition.loc[fam,"Motifs"])
-        motif_file  = "data/" + motif_file if len(motif_file ) > 1 else "" # to remove -
-    else:
-        motif_file = ""
+    fam_bait_hmm = get_from_definition_file("HMM", family_definition, fam, fam_definition_file) #HMM   
+    ref_file = get_from_definition_file("Reference", family_definition, fam, fam_definition_file) #Reference
+    fam_ath_file = get_from_definition_file("Ath", family_definition, fam, fam_definition_file) #Ath  
+    motif_file = get_from_definition_file("Motifs", family_definition, fam, fam_definition_file) #Motifs
+    raw_landmark_file = get_from_definition_file("Landmark", family_definition, fam, fam_definition_file) #Landmark
     
     # Check hmm file for domain filter and hmmer search       
     if (search != "blast" or candidates_domain_filter) and not os.path.isfile( fam_bait_hmm ):            
@@ -1387,11 +1394,8 @@ def main( arguments ):
             sys.stdout.write( 'ERROR: Option "hmmer" for --search only possible if HMM motif defined in ' + fam_definition_file + " for " + fam + " family" + "\n")                   
         if candidates_domain_filter :
             sys.stdout.write( "ERROR: Option --filterdomain only possible if HMM motif defined in " + fam_definition_file + " for " + fam + " family" + "\n")                                    
-        if  len(fam_bait_hmm) > 1:
-            sys.stdout.write( "ERROR: File " + fam_bait_hmm + " does not exist \n")  
         sys.exit()
 
-  
 #%% 
   
     # --- separated analyses for each subject --- #             
@@ -1417,6 +1421,11 @@ def main( arguments ):
         mapping_table_file = job_output_folder + "raw_subject_to_clean_subject_mapping_table.txt"
         if not os.path.isfile( subject_file ):
             clean_input_FASTA_file( raw_subject_file, subject_file, mapping_table_file, cds_input, trim_names )    #remove illegal characters from subject sequence headers
+        landmark_file = job_output_folder + "clean_landmark_flavonoid_bHLHs.pep.fasta"
+        landmark_mapping_table_file = job_output_folder +  "raw_landmark_to_clean_landmark_mapping_table.txt"
+        if os.path.isfile(raw_landmark_file) and not os.path.isfile(landmark_file):
+            clean_input_FASTA_file( raw_landmark_file, landmark_file,landmark_mapping_table_file, cds_input, trim_names )
+               
         fam_check_status = check_fam_IDs_across_files( fam_bait_seq_file_all, fam_bait_seq_file ,fam_info_file, fam_ath_file,ref_file, fam )
         if not fam_check_status:
             sys.exit( "ERROR: analysis is stopped due to inconstistency of " + fam +" IDs between files" )
@@ -1483,17 +1492,16 @@ def main( arguments ):
         # hmm motif            
         hmmsearch_seq_file = job_output_folder +"02_hmmsearch_sequences.fasta"
         aln_hmmsearch_results_file = job_output_folder +"02_hmmsearch_results.txt"
+        aln_hmmsearch_results = {}
         if os.path.isfile( fam_bait_hmm ) and not os.path.isfile( aln_hmmsearch_results_file  ) :                  
             p = subprocess.Popen( args= "cat " + fam_bait_seq_file + " " +  candidate_file + " > " + hmmsearch_seq_file, shell=True )
             p.communicate()                 
-            p = subprocess.Popen( args= hmmsearch + " --tblout " + aln_hmmsearch_results_file + " " + fam_bait_hmm + " " + hmmsearch_seq_file + " > " + job_output_folder + "02_hmmsearch_waste.txt", shell=True )
+            p = subprocess.Popen( args= hmmsearch + " --domtblout " + aln_hmmsearch_results_file + " " + fam_bait_hmm + " " + hmmsearch_seq_file + " > " + job_output_folder + "02_hmmsearch_waste.txt", shell=True )
             p.communicate()
         if os.path.isfile( aln_hmmsearch_results_file  ) :
             aln_hmmsearch_results = load_hmmsearch_results( aln_hmmsearch_results_file )
-        else:
-            aln_hmmsearch_results = {}
-        
-        # --- 02 first classification: 
+   
+        # --- 02 first classification: --- #
         clean_members_file_f =  tree_output_folder + name + "first_a_clean_%ss_.pep.fasta" % (fam)
         tmp_result_table_f =  tree_output_folder + name + "first_b_in_out_%s_analysis_results.txt" % (fam)
         if not os.path.isfile( tmp_result_table_f ):              
@@ -1602,8 +1610,39 @@ def main( arguments ):
         tree_file = tree_constructor( fin_aln_input_file, fin_aln_file, fin_cln_aln_file, fam_bait_seq_file, clean_members_file, result_folder, name, "05_", mode_aln, mode_tree, mafft, muscle, raxml, fasttree, cpur)
         
         
-        # --- 03 find closest reference --- #            
-        if len( ref_file ) > 0:    #only performed if reference file is provided
+        # --- 03 find closest reference for baits --- #            
+        group_around_ref_file = result_folder + name + "03a_baits_group_around_ref_%ss.txt"  % (fam)   #produce table sorted by reference members
+        new_2_ref_mapping_file = result_folder + name + "03b_baits_new_2_ref_%s_mapping_file.txt"  % (fam)   #produce table sorted by subject sequences
+        if not os.path.isfile(group_around_ref_file ):
+            fam_bait_seqs = load_sequences( fam_bait_seq_file)       
+            if not os.path.isfile( new_2_ref_mapping_file ):
+                
+                new2ref_mapping_table, new_per_ref_members = member_group_assignment( fam_bait_seqs, tree_file, clean_members.keys() )
+        
+                with open( group_around_ref_file, "w" ) as out:
+                    out.write( "RefMember\tNewMembers\n" )
+                    gene_order = list( sorted( new_per_ref_members.keys() ) )
+                    for gene in gene_order:
+                        original_gene_names = []
+                        for x in new_per_ref_members[ gene ]:
+                            original_gene_names.append( subject_name_mapping_table[ x ] )
+                        out.write( gene + "\t" + ";".join( original_gene_names )  + "\n" )        
+                
+                with open( new_2_ref_mapping_file, "w" ) as out:
+                    out.write( "NewMember\tRefMember\tEdgeDistance\tPatristicDistance\n" )
+                    gene_order = list( sorted( new2ref_mapping_table.keys() ) )
+                    for gene in gene_order:
+                        out.write( "\t".join( list( map( str, [gene,
+                                                               new2ref_mapping_table[ gene ]['label'],    #map back to member name
+                                                               new2ref_mapping_table[ gene ]['edges'],
+                                                               new2ref_mapping_table[ gene ]['patr']
+                                                               ] ) ) ) + "\n" )    #label, edges, patr
+        
+        
+        # --- 03 find closest reference in reference file --- #            
+        group_around_ref_file = result_folder + name + "03a_reference_group_around_ref_%ss.txt"  % (fam)   #produce table sorted by reference members
+        new_2_ref_mapping_file = result_folder + name + "03b_reference_new_2_ref_%s_mapping_file.txt"  % (fam)   #produce table sorted by subject sequences
+        if len( ref_file ) > 0 and not os.path.isfile(group_around_ref_file ):    #only performed if reference file is provided
             ref_input_file = job_output_folder + "03_repr_sequences.fasta"
             ref_ath_fin_aln_input_file = job_output_folder + "03_repr_ath_fin_alignment_input.fasta"
             ref_ath_fin_aln_file = job_output_folder + "03_repr_ath_fin_alignment_input.fasta.aln"
@@ -1621,12 +1660,8 @@ def main( arguments ):
                     out.write(">" + ref + "\n" + ref_seq + "\n" )                
             ref_tree_file = tree_constructor( ref_ath_fin_aln_input_file, ref_ath_fin_aln_file, ref_ath_fin_cln_aln_file, ref_input_file, clean_members_file,job_output_folder, name, "03_", mode_aln, mode_tree, mafft, muscle, raxml, fasttree, cpur )
         
-            group_around_ref_file = result_folder + name + "03a_group_around_ref_%ss.txt"  % (fam)   #produce table sorted by reference members
-            new_2_ref_mapping_file = result_folder + name + "03b_new_2_ref_%s_mapping_file.txt"  % (fam)   #produce table sorted by subject sequences
-            if not os.path.isfile( new_2_ref_mapping_file ):
-                
-                new2ref_mapping_table, new_per_ref_members = member_group_assignment( ref_members, ref_tree_file, clean_members.keys() )
-        
+            if not os.path.isfile( new_2_ref_mapping_file ):              
+                new2ref_mapping_table, new_per_ref_members = member_group_assignment( ref_members, ref_tree_file, clean_members.keys() )     
                 with open( group_around_ref_file, "w" ) as out:
                     out.write( "RefMember\tFunction\tNewMembers\n" )
                     gene_order = list( sorted( new_per_ref_members.keys() ) )
@@ -1634,8 +1669,7 @@ def main( arguments ):
                         original_gene_names = []
                         for x in new_per_ref_members[ gene ]:
                             original_gene_names.append( subject_name_mapping_table[ x ] )
-                        out.write( ref_members[ gene ]['name'] + "\t" + ref_members[ gene ]['function'] + "\t" + ";".join( original_gene_names )  + "\n" )        
-                
+                        out.write( ref_members[ gene ]['name'] + "\t" + ref_members[ gene ]['function'] + "\t" + ";".join( original_gene_names )  + "\n" )                     
                 with open( new_2_ref_mapping_file, "w" ) as out:
                     out.write( "NewMember\tRefMember\tEdgeDistance\tPatristicDistance\tAnnotation\n" )
                     gene_order = list( sorted( new2ref_mapping_table.keys() ) )
@@ -1647,20 +1681,39 @@ def main( arguments ):
                                                                ref_members[new2ref_mapping_table[ gene ]['label'] ]['function']    #map back to member name
                                                                ] ) ) ) + "\n" )    #label, edges, patr
         
-        
-        #--- 04 check for dna binding properties --- #
+
+        #--- 04 check for domain and dna binding properties --- #
         binding_properties_file = result_folder + name + "04a_bhlh_dna_binding_group_check.txt" #produce table with analysis of dna binding properties
-        domain_check_file = result_folder + name + "04b_bhlh_domain_check.pep.fasta" #FASTA file containing family domain sequences
+        domain_check_file = result_folder + name + "04b_bhlh_domain_check.txt" #FASTA file containing family domain sequences
+        domain_check_file_pep = result_folder + name + "04b_bhlh_domain_check.pep.fasta" #FASTA file containing family domain sequences
         if not os.path.isfile( binding_properties_file ):
-            analyse_bHLH_domain(binding_properties_file, domain_check_file, fin_aln_file,clean_members,subject_name_mapping_table)
-            
+            analyse_bHLH_domain(binding_properties_file, domain_check_file_pep, fin_aln_file,clean_members,subject_name_mapping_table)
+        
+        if (not os.path.isfile(domain_check_file)) and os.path.isfile(aln_hmmsearch_results_file) and len(aln_hmmsearch_results) > 0:
+            with open(  domain_check_file_pep, "w" ) as out:
+                hmmcheck = pd.read_csv(aln_hmmsearch_results_file, delim_whitespace=True,comment="#",header=None)
+                hmmcheck = hmmcheck[hmmcheck[11]<0.00001].sort_values(11).drop_duplicates([0,3])  # highest c-Evalue for each
+                for candidate in sorted(clean_members.keys() ):
+                    try:
+                        best_hit = hmmcheck[hmmcheck[0]==candidate].values[0]
+                        match = clean_members[candidate][best_hit[17]-1:best_hit[18]] 
+                        out.write(">" + subject_name_mapping_table[candidate] + "\n" + match + "\n" )  
+                    except IndexError:
+                        continue
+            with open( domain_check_file, "w" ) as out:
+                  out.write( "OriginalGeneID\tCleanGeneID\tbHLH domain status\n" )
+                  candidates = list( sorted( clean_members.keys() ) )
+                  for candidate in candidates:
+                      domain = "yes" if candidate in aln_hmmsearch_results else "no"
+                      out.write(subject_name_mapping_table[candidate] + "\t" + candidate + "\t" + domain + "\n" )
+                  
 
         # --- 04 check for different motifs --- #
         motif_check_file_summary = result_folder + name + "04c_motif_check.txt"    #produce table with motif (0/1)
         motif_check_file_seqs = result_folder + name + "04c_motif_check_details.txt"    #produce table with motif sequences
         motif_check_hmm_result = job_output_folder + "04_motif_hmmsearch.txt"
         motif_check_hmm_output = job_output_folder + "04_motif_hmmsearch_output.txt"
-        if len( motif_file ) > 0:
+        if len( motif_file ) > 0 and not os.path.isfile(motif_check_file_summary):
             motif_check_results, motif_names = motif_check( clean_members_file, motif_file, motif_check_hmm_result, motif_check_hmm_output ,hmmsearch )    #prim key = seqID, secondary key = motifs
             with open( motif_check_file_summary, "w" ) as out1:
                 out1.write( "RefMember\t"+"\t".join(motif_names)+"\n" )
@@ -1725,7 +1778,13 @@ def main( arguments ):
                     group_aln_file = job_output_folder + "08b_group_alignment_input.fasta.aln"
                     group_cln_aln_file = job_output_folder + "08b_group_alignment_input.fasta.aln.cln"
                     tree_file = tree_constructor( group_aln_input_file, group_aln_file, group_cln_aln_file, repr_and_ath_fasta_file, "", result_folder, name, "08b_", mode_aln, mode_tree, mafft, muscle, raxml, fasttree, cpur)
-                   
+        
+        # --- 09 construct a tree with landmark sequences --- #            
+        land_aln_input_file = job_output_folder + "09_landmark_alignment_input.fasta"
+        land_aln_file = job_output_folder + "09_landmark_alignment_input.fasta.aln"
+        land_cln_aln_file = job_output_folder + "09_landmark_alignment_input.fasta.aln.cln"
+        land_tree_file = tree_constructor( land_aln_input_file, land_aln_file, land_cln_aln_file, landmark_file, clean_members_file, result_folder, name, "09_landmark_", mode_aln, mode_tree, mafft, muscle, raxml, fasttree, cpur)
+
 
         # --- documentation of execution time --- #
         end_time = time.time()
