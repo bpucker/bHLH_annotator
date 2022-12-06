@@ -67,7 +67,7 @@ Optional:
 ```
 
 ## Family definition
-To use the annotator for a family, specific files have to be defined in family_info.csv. 
+To use the annotator for a family, specific files have to be defined in family_annotator.csv. 
 The files refered to need to be placed in the 'data' folder.  
 
 ```

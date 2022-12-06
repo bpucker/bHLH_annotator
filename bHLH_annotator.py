@@ -3,9 +3,9 @@
 
 ### WARNING: do not use underscores in the bait IDs ###
 
-### definition of bHLH family in data/bHLH_info.csv:
-# Family	Baits	BaitsInfo	ThinnedBaits	HMM	Reference	Ath	Motifs
-# bHLH	bHLH_baits.fasta	bHLH_baits.txt	bHLH_baits_thinned.fasta	bHLH_baits_thinned.hmm	AthRefbHLHs.txt	bHLH_at.fasta	bHLH_motifs.hmm
+### definition of bHLH family in data/bHLH_annotator.csv:
+# Baits	BaitsInfo	ThinnedBaits	HMM	Reference	Ath	Motifs
+# bHLH_baits.fasta	bHLH_baits.txt	bHLH_baits_thinned.fasta	bHLH_baits_thinned.hmm	AthRefbHLHs.txt	bHLH_at.fasta	bHLH_motifs.hmm
 
 
 import os, glob, sys, subprocess, dendropy
@@ -1172,11 +1172,11 @@ def analyse_bHLH_domain(binding_properties_file, domain_file,fin_aln_file, membe
     return binding_properties_file
 
 
-def get_from_definition_file(clmn,family_definition, fam, fam_definition_file):
+def get_from_definition_file(clmn,family_definition, fam_definition_file):
     """! @brief gets value from column in definition file; warning, if the file path doesnt exist """
     file = ""  
     if clmn in family_definition.columns:
-        file = str(family_definition.loc[fam,clmn])     
+        file = str(family_definition.loc[0,clmn])     
         if not os.path.isfile(file):
 
            if os.path.isfile("data/" + file):
@@ -1358,35 +1358,35 @@ def main( arguments ):
 
     # --- get inputs from definition file --- # 
     fam = "bHLH"    
-    fam_definition_file = "bHLH_info.csv"
-    family_definition = pd.read_csv(fam_definition_file,sep="\t",index_col=0)
+    fam_definition_file = "bHLH_annotator.csv"
+    family_definition = pd.read_csv(fam_definition_file,sep="\t")
     family_definition = family_definition.fillna('')
     
     if not ("Baits" in family_definition.columns and "BaitsInfo" in family_definition.columns):    
         sys.exit( 'ERROR: Mandatory columns "Baits" and/or "BaitsInfo" are missing in ' + fam_definition_file + "\n" )       
-    if not fam in family_definition.index: 
-        sys.exit( "ERROR: bHLH family not defined in " + fam_definition_file + "\n" )
+    if len(family_definition.index) < 1: 
+        sys.exit( "ERROR: No files defined for " + fam + " family in " + fam_definition_file + "\n" )
        
     #Baits
-    fam_bait_seq_file_all = get_from_definition_file("Baits", family_definition, fam, fam_definition_file)
+    fam_bait_seq_file_all = get_from_definition_file("Baits", family_definition, fam_definition_file)
     if fam_bait_seq_file_all == "":
         sys.exit( 'ERROR: "Baits" file must be defined for execution of annotator \n')  
         
     #BaitsInfo
-    fam_info_file = get_from_definition_file("BaitsInfo", family_definition, fam, fam_definition_file)
+    fam_info_file = get_from_definition_file("BaitsInfo", family_definition, fam_definition_file)
     if fam_info_file == "":
         sys.exit( 'ERROR: "BaitsInfo" file must be defined for execution of annotator \n') 
     
     #ThinnedBaits
-    fam_bait_seq_file  = get_from_definition_file("ThinnedBaits", family_definition, fam, fam_definition_file)
+    fam_bait_seq_file  = get_from_definition_file("ThinnedBaits", family_definition, fam_definition_file)
     if fam_bait_seq_file  == "":
         fam_bait_seq_file = fam_bait_seq_file_all
     
-    fam_bait_hmm = get_from_definition_file("HMM", family_definition, fam, fam_definition_file) #HMM   
-    ref_file = get_from_definition_file("Reference", family_definition, fam, fam_definition_file) #Reference
-    fam_ath_file = get_from_definition_file("Ath", family_definition, fam, fam_definition_file) #Ath  
-    motif_file = get_from_definition_file("Motifs", family_definition, fam, fam_definition_file) #Motifs
-    raw_landmark_file = get_from_definition_file("Landmark", family_definition, fam, fam_definition_file) #Landmark
+    fam_bait_hmm = get_from_definition_file("HMM", family_definition, fam_definition_file) #HMM   
+    ref_file = get_from_definition_file("Reference", family_definition, fam_definition_file) #Reference
+    fam_ath_file = get_from_definition_file("Ath", family_definition, fam_definition_file) #Ath  
+    motif_file = get_from_definition_file("Motifs", family_definition, fam_definition_file) #Motifs
+    raw_landmark_file = get_from_definition_file("Landmark", family_definition, fam_definition_file) #Landmark
     
     # Check hmm file for domain filter and hmmer search       
     if (search != "blast" or candidates_domain_filter) and not os.path.isfile( fam_bait_hmm ):            

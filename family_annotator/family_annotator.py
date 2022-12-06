@@ -3,7 +3,7 @@
 
 ### WARNING: do not use underscores in the bait IDs ###
 
-### definition of families in data/family_info.csv:
+### definition of families in data/family_annotator.csv:
 # Family	Baits	BaitsInfo	ThinnedBaits	HMM	Reference	Ath	Motifs
 # bHLH	bHLH_baits.fasta	bHLH_baits.txt	bHLH_baits_thinned.fasta	bHLH_baits_thinned.hmm	AthRefbHLHs.txt	bHLH_at.fasta	bHLH_motifs.hmm
 
@@ -1199,12 +1199,6 @@ def main( arguments ):
     if not os.path.exists( output_folder ):
         os.makedirs( output_folder )
     
-    fam_definition_file = "family_info.csv"
-    family_definition = pd.read_csv(fam_definition_file,sep="\t",index_col=0)
-    family_definition = family_definition.fillna('')
-    if not ("Baits" in family_definition.columns and "BaitsInfo" in family_definition.columns):    
-        sys.exit( 'ERROR: Mandatory columns "Baits" and/or "BaitsInfo" are missing in information file: ' + fam_definition_file )
-
 #%%
     if "--family" in arguments:
         if "," in arguments[ arguments.index("--family")+1 ]:
@@ -1374,7 +1368,7 @@ def main( arguments ):
     for fam in family:
        
         # --- get inputs from definition file --- # 
-        fam_definition_file = "family_info.csv"
+        fam_definition_file = "family_annotator.csv"
         family_definition = pd.read_csv(fam_definition_file,sep="\t",index_col=0)
         family_definition = family_definition.fillna('')
         

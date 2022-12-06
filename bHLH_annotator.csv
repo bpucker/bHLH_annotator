@@ -1,0 +1,2 @@
+Baits	BaitsInfo	ThinnedBaits	HMM	Reference	Ath	Motifs	Landmark
+bHLH_baits.fasta	bHLH_baits.txt	bHLH_baits_thinned.fasta	bHLH_baits_thinned.hmm	AthRefbHLHs.txt	bHLH_at.fasta	bHLH_motifs.hmm	landmark_flavonoid_bHLHs.pep.fasta

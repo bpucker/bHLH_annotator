@@ -67,8 +67,8 @@ Optional:
 ```
 
 ## Family definition
-To use the annotator for a family, specific files have to be defined in bHLH_info.csv. 
-The files refered to need to be placed in the 'data' folder.  
+To use the annotator for a family, specific files have to be defined in bHLH_annotator.csv. 
+The files refered to need to be placed in the 'data' folder or defined using complete paths.  
 
 ```
 Mandatory:
