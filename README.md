@@ -1,28 +1,18 @@
 # bHLH_annotator
-automatic annotation of bHLH gene family in plants
-
-
-
-table about all genome-wide bHLH studies (table)
-
-
-bHLH land mark sequences (done)
-
-bHLH sequences of all species (subfolder/archive)
-
-
+automativ functional annotation of the bHLH transcription factor family in plants
 
 ## Usage 
 
 ```
 cd <PATH>/bHLH_annotator
-python3 bHLH_annotator.py --subject <PATH> --out <OUTPUT>
+python3 bHLH_annotator.py --subject <PATH> --out <OUTPUT> --info <DEFINITION_FILE>
 ```
 
 ```
 Mandatory:
 --out           STR     Output folder
 --subject       STR     Subject file   | --subjectdir    STR     Subject dir
+--info          STR     CSV definition file | --baits   STR    Baits file  --baitsinfo     STR   Baits info file  
 					
 Optional:
 --family		LIST	Families the search is executed on (from family_info.csv)	[bHLH]
@@ -67,7 +57,7 @@ Optional:
 ```
 
 ## Family definition
-To use the annotator for a family, specific files have to be defined in bHLH_annotator.csv. 
+To use the annotator for a family, specific files have to be defined in bHLH_annotator.csv which is given via the "--info" argument. 
 The files refered to need to be placed in the 'data' folder or defined using complete paths.  
 
 ```
