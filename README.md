@@ -73,3 +73,12 @@ Reference		File name of reference file
 Ath				File name of Ath family members
 Motifs			File name of motifs file for motif search
 ```
+
+## Requirements
+dendropy, BLAST, HMMER, MAFFT, MUSCLE, RAxML or FastTree2
+
+## Reference
+This repository.
+
+
+
