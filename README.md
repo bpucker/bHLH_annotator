@@ -1,5 +1,5 @@
 # bHLH_annotator
-automatic functional annotation of the bHLH transcription factor family in plants
+This pipeline was developed for the automatic identification and functional annotation of the bHLH transcription factor family in novel plant sequence data sets. Coding sequences or peptide sequences derived from a de novo genome/transcriptome assembly can be analyzed with this pipeline.
 
 ## Usage 
 
