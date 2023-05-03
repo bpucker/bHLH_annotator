@@ -78,7 +78,7 @@ Motifs			File name of motifs file for motif search
 dendropy, BLAST, HMMER, MAFFT, MUSCLE, RAxML or FastTree2
 
 ## Reference
-This repository.
+Thoben C. and Pucker B. (2023). Automatic annotation of the bHLH gene family in plants. bioRxiv 2023.05.02.539087; doi: [10.1101/2023.05.02.539087](https://doi.org/10.1101/2023.05.02.539087)
 
 
 
