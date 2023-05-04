@@ -1,5 +1,5 @@
 # bHLH_annotator
-automativ functional annotation of the bHLH transcription factor family in plants
+automatic functional annotation of the bHLH transcription factor family in plants
 
 ## Usage 
 

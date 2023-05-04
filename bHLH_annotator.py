@@ -1600,8 +1600,8 @@ def main( arguments ):
         # --- 02 second classification: 
         clean_members_file_s =  tree_output_folder + name + "second_clean_%ss.pep.fasta" % (fam)
         tmp_result_table_s =  tree_output_folder + name + "second_in_out_%s_analysis_results.txt" % (fam)
-        clean_members_file = result_folder + name + "02a_clean_%ss.pep.fasta" % (fam)
-        tmp_result_table = result_folder + name + "02b_in_out_%s_analysis_results.txt" % (fam)
+        clean_members_file = result_folder + name + "02_clean_%ss.pep.fasta" % (fam)
+        tmp_result_table = result_folder + name + "02_in_out_%s_analysis_results.txt" % (fam)
         if not os.path.isfile( tmp_result_table ):
         
             fam_classification = {}
@@ -1667,7 +1667,7 @@ def main( arguments ):
         
         # --- 04 find closest reference for baits --- #            
         group_around_ref_file = result_folder + name + "04a_candidates_group_around_%s_bait.txt"  % (fam)   #produce table sorted by baits
-        new_2_ref_mapping_file = result_folder + name + "04b_candidate_2_%s_bait_mapping_file.txt"  % (fam)   #produce table sorted by subject sequences
+        new_2_ref_mapping_file = result_folder + name + "04a_candidate_2_%s_bait_mapping_file.txt"  % (fam)   #produce table sorted by subject sequences
         if not os.path.isfile(group_around_ref_file ):
             fam_bait_seqs = load_sequences( fam_bait_seq_file)       
             if not os.path.isfile( new_2_ref_mapping_file ):
@@ -1695,7 +1695,7 @@ def main( arguments ):
         
         
         # --- 04 find closest reference in reference file --- #            
-        group_around_ref_file = result_folder + name + "04a_candidates_group_around_reference.txt"   #produce table sorted by reference members
+        group_around_ref_file = result_folder + name + "04b_candidates_group_around_reference.txt"   #produce table sorted by reference members
         new_2_ref_mapping_file = result_folder + name + "04b_candidate_2_reference_mapping_file.txt"     #produce table sorted by subject sequences
         if len( ref_file ) > 0 and not os.path.isfile(group_around_ref_file ):    #only performed if reference file is provided
             ref_input_file = job_output_folder + "04_reference_sequences.fasta"
@@ -1738,9 +1738,9 @@ def main( arguments ):
         
 
         #--- 05 check for domain and dna binding properties --- #
-        binding_properties_file = result_folder + name + "05a_bhlh_dna_binding_group_check.txt" #produce table with analysis of dna binding properties
-        domain_check_file = result_folder + name + "05b_bhlh_domain_check.txt" #FASTA file containing family domain sequences
-        domain_check_file_pep = result_folder + name + "05b_bhlh_domain_check.pep.fasta" #FASTA file containing family domain sequences
+        binding_properties_file = result_folder + name + "05_bhlh_dna_binding_group.txt" #produce table with analysis of dna binding properties
+        domain_check_file = result_folder + name + "05_bhlh_domain_check.txt" #FASTA file containing family domain sequences
+        domain_check_file_pep = result_folder + name + "05_bhlh_domains.pep.fasta" #FASTA file containing family domain sequences
         if not os.path.isfile( binding_properties_file ):
             analyse_bHLH_domain(binding_properties_file, domain_check_file_pep, fin_aln_file,clean_members,subject_name_mapping_table)
         
@@ -1799,8 +1799,8 @@ def main( arguments ):
         # --- 08 find in species-specific paralogs (in-paralogs) --- #
         if collapse_mode:
             paralog_groups = establish_paralog_groups( tree_file, clean_members.keys(), dist_cutoff_factorB )    #get list of sublist; each sublist represents one paralog group
-            paralog_group_file = result_folder + name + "08a_repr_%ss.txt" % (fam)
-            repr_clean_file = result_folder + name + "08b_repr_%ss.pep.fasta" % (fam)
+            paralog_group_file = result_folder + name + "08_repr_%ss.txt" % (fam)
+            repr_clean_file = result_folder + name + "08_repr_%ss.pep.fasta" % (fam)
             if not os.path.isfile( repr_clean_file ):
                 rep_per_group = get_represenative_paralog_per_group( paralog_groups, clean_members, repr_clean_file )
                 with open( paralog_group_file, "w" ) as out:
@@ -1815,10 +1815,10 @@ def main( arguments ):
                         for key in list( rep_per_group.keys() ):
                             out.write( '>' + key + "\n" + cds_subject_sequences[ key ] + "\n" )
                             
-            repr_fin_aln_input_file = job_output_folder + "08c_repr_fin_alignment_input.fasta"
-            repr_fin_aln_file = job_output_folder + "08c_repr_fin_alignment_input.fasta.aln"
-            repr_fin_cln_aln_file = job_output_folder + "08c_repr_fin_alignment_input.fasta.aln.cln"
-            tree_constructor( repr_fin_aln_input_file, repr_fin_aln_file, repr_fin_cln_aln_file, fam_bait_seq_file, repr_clean_file, result_folder, name, "08c_representatives_baits_", mode_aln, mode_tree, mafft, muscle, raxml, fasttree, cpur)
+            repr_fin_aln_input_file = job_output_folder + "08_repr_fin_alignment_input.fasta"
+            repr_fin_aln_file = job_output_folder + "08_repr_fin_alignment_input.fasta.aln"
+            repr_fin_cln_aln_file = job_output_folder + "08_repr_fin_alignment_input.fasta.aln.cln"
+            tree_constructor( repr_fin_aln_input_file, repr_fin_aln_file, repr_fin_cln_aln_file, fam_bait_seq_file, repr_clean_file, result_folder, name, "08_representatives_baits_", mode_aln, mode_tree, mafft, muscle, raxml, fasttree, cpur)
                         
             # --- 09 represent cluster only by longest sequence --- #
             if len( fam_ath_file ) > 0:
@@ -1832,12 +1832,12 @@ def main( arguments ):
                     ref_members = load_ref_members( ref_file ) # id : id name function group
                     new2ref_mapping_table = load_candidate_mem_to_mem_mapping_table( new_2_ref_mapping_file ) # cnd : ref
                     repr_and_ath_for_tree = load_sequences( repr_ath_fin_aln_input_file ) # id : seq of ath and cnds
-                    repr_and_ath_fasta_file = result_folder + name + "09b_repr_ath_%s.fasta" % (fam)
+                    repr_and_ath_fasta_file = job_output_folder + name + "09_repr_ath_%s.fasta" % (fam)
                     construct_fasta_file_w_repr_and_aths( ref_members, new2ref_mapping_table, repr_and_ath_for_tree, repr_and_ath_fasta_file )
-                    group_aln_input_file = job_output_folder + "09c_group_alignment_input.fasta"
-                    group_aln_file = job_output_folder + "09c_group_alignment_input.fasta.aln"
-                    group_cln_aln_file = job_output_folder + "09c_group_alignment_input.fasta.aln.cln"
-                    tree_file = tree_constructor( group_aln_input_file, group_aln_file, group_cln_aln_file, repr_and_ath_fasta_file, "", result_folder, name, "09c_representatives_ath_detailed_", mode_aln, mode_tree, mafft, muscle, raxml, fasttree, cpur)
+                    group_aln_input_file = job_output_folder + "09b_group_alignment_input.fasta"
+                    group_aln_file = job_output_folder + "09b_group_alignment_input.fasta.aln"
+                    group_cln_aln_file = job_output_folder + "09b_group_alignment_input.fasta.aln.cln"
+                    tree_file = tree_constructor( group_aln_input_file, group_aln_file, group_cln_aln_file, repr_and_ath_fasta_file, "", result_folder, name, "09b_representatives_ath_detailed_", mode_aln, mode_tree, mafft, muscle, raxml, fasttree, cpur)
         
         # --- 09 construct a tree with landmark sequences --- #            
         land_aln_input_file = job_output_folder + "10_landmark_alignment_input.fasta"
