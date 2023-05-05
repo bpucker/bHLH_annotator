@@ -1,5 +1,5 @@
 # bHLH_annotator
-automatic functional annotation of the bHLH transcription factor family in plants
+This pipeline was developed for the automatic identification and functional annotation of the bHLH transcription factor family in novel plant sequence data sets. Coding sequences or peptide sequences derived from a de novo genome/transcriptome assembly can be analyzed with this pipeline.
 
 ## Usage 
 
@@ -73,3 +73,12 @@ Reference		File name of reference file
 Ath				File name of Ath family members
 Motifs			File name of motifs file for motif search
 ```
+
+## Requirements
+dendropy, BLAST, HMMER, MAFFT, MUSCLE, RAxML or FastTree2
+
+## Reference
+Thoben C. and Pucker B. (2023). Automatic annotation of the bHLH gene family in plants. bioRxiv 2023.05.02.539087; doi: [10.1101/2023.05.02.539087](https://doi.org/10.1101/2023.05.02.539087)
+
+
+
