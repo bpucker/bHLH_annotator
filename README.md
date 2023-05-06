@@ -8,8 +8,8 @@ A phylogenetic approach is performed for the annotation of the candidates, based
 
 For the identification of initial bHLH candidates (**step 1**), two search options are available:
 
- - BLAST option (default): Candidates are identified based on sequence similarity to the bait collection. This option is recommended if also bHLHs with a lost domain should be identified.
- - HMMER option: Candidates which harbour the HMM motif of the bait collection are identified. This includes candidates with a high specification, that are not represented by the bait collection.
+ - **BLAST option** (default): Candidates are identified based on sequence similarity to the bait collection. This option is recommended if also bHLHs with a lost domain should be identified.
+ - **HMMER option**: Candidates which harbour the HMM motif of the bait collection are identified. This includes candidates with a high specification, that are not represented by the bait collection.
  
 The initial candidates are classified based on their phylogenetic relationship to the bHLH and outgroup baits (**step 2**). The final bHLH candidates are represented in a phylogenetic tree (**step 3**) together with the bait collection. The functional annotation of  the candidates is assigned by identifying ortholog reference sequences (**step 4**).  As default references, annotated *A. thaliana* bHLHs are used. Also, ortholog bait sequences are identified. In the next steps, bHLH-specific characteristics are analyzed for each candidate: Presence of the bHLH domain (**step 5**), DNA-binding properties (**step 5**), and the identification of subfamily specific motifs (**step 6**). A phylogenetic tree is constructed with *A. thaliana* bHLHs to allow a detailed investigation on the foundation of a well-studied species (**step 7**). For large datasets like *de novo* transcriptome assemblies, the collapse option is recommended (**step 8 and 9**) which collapses paralogous groups by defining a representative candidate.  In case of these, the parallel option is also recommenced to reduce the pipeline runtime and consumption of memory resources.
 
