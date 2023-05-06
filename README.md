@@ -2,7 +2,7 @@
 
 The bHLH_annotator allows the automatic identification and functional annotation of the bHLH transcription factor family in novel plant sequence data sets.  Coding sequences or peptide sequences derived from a de novo genome and transcriptome assembly can be analyzed with this pipeline. 
 
-A phylogenetic approach is performed for the annotation of the candidates, based on a [bait collection](https://github.com/bpucker/bHLH_annotator/blob/main/supplements/) of bHLHs and outgroup sequences (non-bHLHs with a high sequence similarity to bHLHs):
+A phylogenetic approach is performed for the annotation of the candidates, based on a [bait collection](https://github.com/bpucker/bHLH_annotator/blob/main/supplements/) of bHLHs and outgroup sequences (non-bHLHs with a high sequence similarity to bHLHs):   
 
 <img alt="bHLH_annotator steps" src="https://github.com/bpucker/bHLH_annotator/blob/main/bHLH_annotator.png?raw=true" width="50%" height="70%">
 
