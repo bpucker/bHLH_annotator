@@ -1405,10 +1405,10 @@ def main( arguments ):
         sys.exit( 'ERROR: "BaitsInfo" file must be defined for execution of annotator \n') 
     
     #ThinnedBaits
-    if "--thinnedbaits" in arguments:
-        fam_bait_seq_file  = get_from_arguments_file(arguments, "--thinnedbaits")
+    if "--optimisedbaits" in arguments:
+        fam_bait_seq_file  = get_from_arguments_file(arguments, "--optimisedbaits")
     else: 
-        fam_bait_seq_file  = get_from_definition_file("ThinnedBaits", family_definition, fam_definition_file)   
+        fam_bait_seq_file  = get_from_definition_file("OptimisedBaits", family_definition, fam_definition_file)   
     if fam_bait_seq_file  == "":
         fam_bait_seq_file = fam_bait_seq_file_all
     
