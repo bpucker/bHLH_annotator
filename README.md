@@ -13,9 +13,11 @@ For the identification of initial bHLH candidates (**step 1**), two search optio
  
 The initial candidates are classified based on their phylogenetic relationship to the bHLH and outgroup baits (**step 2**). 
 
-The functional annotation of  the candidates is assigned by identifying ortholog reference sequences (**step 4**).  As default references, annotated *A. thaliana* bHLHs are used. Also, ortholog bait sequences are identified. In the next steps, bHLH-specific characteristics are analyzed for each candidate: Presence of the bHLH domain (**step 5**), DNA-binding properties (**step 5**), and the identification of subfamily specific motifs (**step 6**). A phylogenetic tree is constructed with *A. thaliana* bHLHs to allow a detailed investigation on the foundation of a well-studied species (**step 7**). For large datasets like *de novo* transcriptome assemblies, the collapse option is recommended (**step 8 and 9**) which collapses paralogous groups by defining a representative candidate.  In case of these, the parallel option is also recommenced to reduce the pipeline runtime and consumption of memory resources.
+The functional annotation of  the candidates is assigned by identifying ortholog reference sequences (**step 4**).  As default references, annotated *A. thaliana* bHLHs are used. Also, ortholog bait sequences are identified. In the next steps, bHLH-specific characteristics are analyzed for each candidate: Presence of the bHLH domain (**step 5**), DNA-binding properties (**step 5**), and the identification of subfamily specific motifs (**step 6**). A phylogenetic tree is constructed with *A. thaliana* bHLHs to allow a detailed investigation on the foundation of a well-studied species (**step 7**). 
 
-The data files used in each step can be customised by the user to allow an investigation suiting the own research purpose (Described below). A more detailed description of the pipeline and the bait collection can be found in the [reference](https://doi.org/10.1101/2023.05.02.539087). 
+For large datasets like *de novo* transcriptome assemblies, the collapse option is recommended (**step 8 and 9**) which collapses paralogous groups by defining a representative candidate.  In case of these, the parallel option is also recommenced to reduce the pipeline runtime and consumption of memory resources.
+
+The data files used in each step can be customised by the user to allow an investigation suiting the own research purpose (described below). A more detailed description of the pipeline and the bait collection can be found in the [reference](https://doi.org/10.1101/2023.05.02.539087). 
 
 ## Setup
 
