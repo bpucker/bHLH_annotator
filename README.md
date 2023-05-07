@@ -76,9 +76,9 @@ The ```--subject``` file defines the path to the input FASTA file containing cod
 #### Optional arguments for tool adjustments
 |Command|Description|Default
 |--|--|--
-|```--search <STR>```    |Search option for the inistial search (```blast|hmmer```)|```blast```
-|```--mode_aln <STR>```    |Alignment tool (```muscle|mafft```)|```muscle```
-|```--mode_tree <STR>```    |Tool for tree construction (```fasttree|raxml```)|```fasttree```
+|```--search <STR>```    |Search option for the inistial search (```blast / hmmer```)|```blast```
+|```--mode_aln <STR>```    |Alignment tool (```muscle / mafft```)|```muscle```
+|```--mode_tree <STR>```    |Tool for tree construction (```fasttree / raxml```)|```fasttree```
 |```--blastp <STR>```    |Path to blastp|```blastp```
 |```--makeblastdb <STR>```    |Path to makeblastdb |```makeblastdb```
 |```--hmmsearch <STR>```    |Path to hmmsearch|```hmmsearch```
