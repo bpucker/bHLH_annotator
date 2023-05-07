@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/434292916.svg)](https://zenodo.org/badge/latestdoi/434292916)
+
 # Automatic annotation of the bHLH gene family in plants
 
 The bHLH_annotator allows the automatic identification and functional annotation of the bHLH transcription factor family in novel plant sequence data sets.  Coding sequences or peptide sequences derived from a de novo genome and transcriptome assembly can be analyzed with this pipeline. 
