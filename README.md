@@ -69,7 +69,6 @@ The ```--subject``` file defines the path to the input FASTA file containing cod
 |```--keepnames ```    |Prevents splitting of sequence names at first space|--
 |```--collapse```    |Reduces paralogs to one representative|--
 |```--parallel```    |Parallel option for classification|--
-|```--numprocesscandidates <INT>```    |Number of candidates processed at the same time in the parallel option|```200``` 
 
 #### Optional arguments for tool adjustments
 |Command|Description|Default
@@ -97,7 +96,8 @@ The ```--subject``` file defines the path to the input FASTA file containing cod
 |```--numneighbours <INT>```    | Neighbours to consider for classification|```10``` 
 |```--neighbourdist <FLOAT>```    | X*average nearest neighbour distance is used as minimal distance cutoff to be considered as a neighbour|```5``` 
 |```--minneighbours <INT>```    |Minimal number of bait neighbours to be considered as ingroup|```0```
-|```--paralogdist <FLOAT>```    |X*average nearest neighbour distance is used as cutoff to identify paralogs| ```10.0``` 
+|```--paralogdist <FLOAT>```    |X*average nearest neighbour distance is used as cutoff to identify paralogs| ```10.0```
+|```--numprocesscandidates <INT>```    |Number of candidates processed at the same time in the parallel option|```200```  
 
   #### Optional arguments regarding performance
 |Command|Description|Default
