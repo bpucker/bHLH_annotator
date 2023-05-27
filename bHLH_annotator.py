@@ -8,7 +8,7 @@
 # bHLH_baits.fasta	bHLH_baits.txt	bHLH_baits_thinned.fasta	bHLH_baits_thinned.hmm	AthRefbHLHs.txt	bHLH_at.fasta	bHLH_motifs.hmm
 
 
-import os, glob, sys, subprocess, dendropy
+import os, glob, sys, subprocess, dendropy, datetime
 from operator import itemgetter
 import math, time
 import pandas as pd
@@ -319,7 +319,7 @@ def check_fam_IDs_across_files( fam_bait_seq_file, fam_bait_seq_file_thinned,fam
                         missing_ref_ids.append( x )
                 line = f.readline()
         if len( missing_ref_ids ) > 0:
-            sys.stderr.write( "Reference " + fam + " IDs missing in thinned bait or Ath members FASTA file): " + ";".join( missing_ref_ids ) + "\n" )
+            sys.stderr.write( "Reference " + fam + " IDs missing in bait collection or Ath members FASTA file): " + ";".join( missing_ref_ids ) + "\n" )
             sys.stderr.flush()
             fam_status = False
         
@@ -1431,8 +1431,8 @@ def main( arguments ):
         fam_ath_file = get_from_definition_file("Ath", family_definition, fam_definition_file) #Ath  
     
     #Motif
-    if "--motif" in arguments:
-        motif_file = get_from_arguments_file(arguments, "--motif")
+    if "--motifs" in arguments:
+        motif_file = get_from_arguments_file(arguments, "--motifs")
     else:    
         motif_file = get_from_definition_file("Motifs", family_definition, fam_definition_file) #Motifs
         
@@ -1495,7 +1495,7 @@ def main( arguments ):
                                     bitscore_p, similarity_cutoff_p, possibility_cutoff_p, length_cutoff_p, cds_input,
                                     min_score_cutoff,neighbour_cutoff, mean_factor_cutoff, min_neighbour_cutoff, dist_cutoff_factorB, fam,
                                     candidates_domain_filter, parallel_mode, num_process_candidates, name, trim_names, collapse_mode, parameter_graphs)        
-        start_time = time.time()    
+        start_time = datetime.datetime.now()   
         
         
         # --- 01 find initial candidates --- #
@@ -1847,20 +1847,23 @@ def main( arguments ):
 
 
         # --- documentation of execution time --- #
-        end_time = time.time()
+        end_time = datetime.datetime.now()
+        duration = end_time - start_time
+        seconds = duration.total_seconds()
         with open(doc_file, "a") as out:
-            out.write("\n" + "Execution time: " + time.strftime("%Hh:%Mmin:%Ssec", time.gmtime(end_time-start_time)) )
-                        
+            out.write("\n" + "Execution time: " + f"{int(seconds // 3600)}h:{int((seconds % 3600) // 60)}min:{int(seconds % 60)}sec")               
 
-                        
-if __name__ == "__main__":      
-    if '--out' in sys.argv and '--subject' in sys.argv and "--info" in sys.argv:
-        main( sys.argv )
-    elif '--out' in sys.argv and '--subjectdir' in sys.argv and "--info" in sys.argv:
-        main( sys.argv )
-    if '--out' in sys.argv and '--subject' in sys.argv and "--baits" in sys.argv and "--baitsinfo" in sys.argv:
-        main( sys.argv )
-    elif '--out' in sys.argv and '--subjectdir' in sys.argv and "--baits" in sys.argv and "--baitsinfo" in sys.argv:
-        main( sys.argv )
-    else:
-        sys.exit( __usage__ ) 
+        sys.stdout.write("\n" + "Successfully finished execution. " + "\n")                
+  
+  
+    
+if '--out' in sys.argv and '--subject' in sys.argv and "--info" in sys.argv:
+    main( sys.argv )
+elif '--out' in sys.argv and '--subjectdir' in sys.argv and "--info" in sys.argv:
+    main( sys.argv )
+elif '--out' in sys.argv and '--subject' in sys.argv and "--baits" in sys.argv and "--baitsinfo" in sys.argv:
+    main( sys.argv )
+elif '--out' in sys.argv and '--subjectdir' in sys.argv and "--baits" in sys.argv and "--baitsinfo" in sys.argv:
+    main( sys.argv )
+else:
+    sys.exit( __usage__ ) 

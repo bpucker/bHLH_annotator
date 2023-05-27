@@ -59,7 +59,7 @@ The pipeline is executed through the following command:
 cd <PATH>/bHLH_annotator
 python3 bHLH_annotator.py --subject <PATH> --out <OUTPUT> --info <DEFINITION_FILE>
 ```
-The ```--subject``` file defines the path to the input FASTA file containing coding or peptide sequences. The output directory is defined with the ```--out``` command. In the output directory, a RESULT folder is created containing the output files created in the pipeline steps. The ```--info```file represents the bHLH_annotator.csv. This file is necessary as it defines the input data files utilized in the pipeline.  
+The ```--subject``` file defines the path to the input FASTA file containing coding or peptide sequences. The output directory is defined with the ```--out``` command. In the output directory, a RESULT folder is created containing the output files created in the pipeline steps. The ```--info``` file represents the bHLH_annotator.csv. This file is necessary as it defines the input data files utilized in the pipeline.  
 
 #### Optional arguments regarding subject file
 |Command|Description|Default
@@ -76,7 +76,7 @@ The ```--subject``` file defines the path to the input FASTA file containing cod
 #### Optional arguments for tool adjustments
 |Command|Description|Default
 |--|--|--
-|```--search <STR>```    |Search option for the inistial search (```blast / hmmer```)|```blast```
+|```--search <STR>```    |Search option for the initial search (```blast / hmmer```)|```blast```
 |```--mode_aln <STR>```    |Alignment tool (```muscle / mafft```)|```muscle```
 |```--mode_tree <STR>```    |Tool for tree construction (```fasttree / raxml```)|```fasttree```
 |```--blastp <STR>```    |Path to blastp|```blastp```
@@ -91,7 +91,7 @@ The ```--subject``` file defines the path to the input FASTA file containing cod
 |Command|Description|Default
 |--|--|--
 |```--bitcutp <INT>```    |BLASTp bitscore cutoff|```60```
-|```--bitcutp	 <INT>```    | BLASTp similarity cutoff |```40.0``` 
+|```--simcutp	 <INT>```    | BLASTp similarity cutoff |```40.0``` 
 |```--poscutp <INT>```    | Max number of BLASTp hits per bait|```100```
 |```--lencutp <INT>```    |Min BLASTp alignment length|```80``` 
 |```--filterdomain```    |Filter candidates not matching the HMM motif of the bait collection|-- 
@@ -110,7 +110,7 @@ The ```--subject``` file defines the path to the input FASTA file containing cod
 
 
 ## Adjustment of input data files
-The data input files required as resources for the steps of the pipeline are defined in the ```bHLH_annotator.csv``` file. The default files are stored in the ```data```folder. The following files are required as resources:
+The data input files required as resources for the steps of the pipeline are defined in the ```bHLH_annotator.csv``` file. The default files are stored in the ```data``` folder. The following files are required as resources:
 
 |File|Description|Argument
 |--|--|--
@@ -122,9 +122,14 @@ Reference | References with alternative name, functional annotation and subfamil
 Motifs | HMM motifs of subfamily specific motifs (step 5) | ```--motifs <PATH>```
 Ath |*A. thaliana* sequences used for tree construction (step 7 and 9) | ```--ath <PATH>```
 
-If the optional files are not defined in the ```bHLH_annotator.csv``` file or via argument, the dependent pipeline steps are skipped. If the files are defined both in the csv file and via argument, the argument is prioritized. The files refered to need to be placed in the 'data' folder or defined using complete paths.
+The defined files must meet the following requirements:
+* Baits and OptimisedBaits: All baits, including optimised baits, must be categorized in the BaitsInfo file as ingroup or outgroup sequences.
+* BaitsInfo: All sequences categorized in the BaitsInfo file must be included in the Baits file.
+* Reference: The sequences of the specified references must be included in the Ath sequence file or the bait collection.
 
+If the optional files are not defined in the ```bHLH_annotator.csv``` file or via argument, the dependent pipeline steps are skipped. If the files are defined both in the csv file and via argument, the argument is prioritized. The files refered to need to be placed in the 'data' folder or defined using complete paths.
  
+
 ## Requirements
 Python, dendropy, pandas, numpy, matplotlib, BLAST+, HMMER, MAFFT or MUSCLE5, FastTree2 or RAxML 
 
