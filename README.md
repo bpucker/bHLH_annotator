@@ -64,7 +64,7 @@ The ```--subject``` file defines the path to the input FASTA file containing cod
 #### Optional arguments regarding subject file
 |Command|Description|Default
 |--|--|--
-|```--name STR```    |Prefix of output file names|--
+|```--name <STR>```    |Prefix of output file names|--
 |```--cdsinput ```    |Changes expected input to CDS|--
 |```--keepnames ```    |Prevents splitting of sequence names at first space|--
 |```--collapse```    |Reduces paralogs to one representative|--
@@ -91,7 +91,7 @@ The ```--subject``` file defines the path to the input FASTA file containing cod
 |Command|Description|Default
 |--|--|--
 |```--bitcutp <INT>```    |BLASTp bitscore cutoff|```60```
-|```--simcutp	 <INT>```    | BLASTp similarity cutoff |```40.0``` 
+|```--simcutp <INT>```    | BLASTp similarity cutoff |```40.0``` 
 |```--poscutp <INT>```    | Max number of BLASTp hits per bait|```100```
 |```--lencutp <INT>```    |Min BLASTp alignment length|```80``` 
 |```--filterdomain```    |Filter candidates not matching the HMM motif of the bait collection|-- 
