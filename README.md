@@ -82,7 +82,7 @@ The ```--subject``` file defines the path to the input FASTA file containing cod
 |```--mafft <STR>```   |Path to MAFFT|```mafft```
 |```--muscle <STR>```    |Path to muscle|```muscle```
 |```--fasttree <STR>```    |Path to FastTree|```fasttree```
-|```--raxml <STR>```    |Path to RAxML|```raxml```
+|```--raxml <STR>```    |Path to RAxML|```raxml-ng```
 
   #### Optional arguments to adjust the candidate search and classification
 |Command|Description|Default

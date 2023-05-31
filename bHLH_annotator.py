@@ -48,7 +48,7 @@ __usage__ = """
                     --mafft <PATH_TO_MAFFT>[raxml]              
                     --muscle <PATH_TO_MUSCLE>[raxml]                
                     --fasttree <PATH_TO_FASTTREE>[fasttree]
-                    --raxml <PATH_TO_RAXML>[raxml]  
+                    --raxml <PATH_TO_RAXML>[raxml-ng]  
 		                
                     --simcutp <BLASTP_SIMILARITY_CUTOFF>[40.0]
                     --poscutp <BLASTP_POSSIBLE_HIT_NUMBER_PER_BAIT_CUTOFF>[100]
@@ -1316,7 +1316,7 @@ def main( arguments ):
     if "--raxml" in arguments:
         raxml = arguments[ arguments.index("--raxml")+1 ]
     else:
-        raxml = "raxml"
+        raxml = "raxml-ng"
        
     # --- BLAST hit cutoffs --- #
     if "--simcutp" in arguments:
