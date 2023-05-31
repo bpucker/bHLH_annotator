@@ -13,4 +13,4 @@ dependencies:
   - numpy
   - pandas
   - python
-  - raxml
+  - raxml-ng
