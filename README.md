@@ -1,6 +1,8 @@
 [![DOI](https://zenodo.org/badge/434292916.svg)](https://zenodo.org/badge/latestdoi/434292916)
 
 # Automatic annotation of the bHLH gene family in plants
+###  &rarr; bHLH_annotator is also available on the [BioInfToolServer](https://pbb-tools.de/bHLH_annotator/)
+
 
 The bHLH_annotator allows the automatic identification and functional annotation of the bHLH transcription factor family in novel plant sequence data sets.  Coding sequences or peptide sequences derived from a de novo genome and transcriptome assembly can be analyzed with this pipeline. 
 
@@ -111,15 +113,15 @@ The ```--subject``` file defines the path to the input FASTA file containing cod
 ## Adjustment of input data files
 The data input files required as resources for the steps of the pipeline are defined in the ```bHLH_annotator.csv``` file. The default files are stored in the ```data``` folder. The following files are required as resources:
 
-|File|Description|Argument
-|--|--|--
-Baits | Contains the bHLH and outgroup sequences of the bait collection (mandatory) |```--baits <PATH>```
-BaitsInfo| Info file defining each bait as bHLH or outgroup sequence (mandatory) | ```--baitsinfo <PATH>``` 
-OptimisedBaits | Optimised bait collection containing only phylogenetic distinct baits that are used for tree construction (recommended) | ```--optimisedbaits <PATH>```
-HMM | HMM motif representing the bHLH domain (step 2 for HMMER search, step 5, and ```--filterdomain``` option)| ```--hmm <PATH>```
-Reference | References with alternative name, functional annotation and subfamily (step 4 and 9) | ```--reference <PATH>```
-Motifs | HMM motifs of subfamily specific motifs (step 5) | ```--motifs <PATH>```
-Ath |*A. thaliana* sequences used for tree construction (step 7 and 9) | ```--ath <PATH>```
+|Argument       |File           |Description                                                       
+|--------------|---------------|-------------------------------------------------------------------
+|`--baits <PATH>`           |Baits          |Contains the bHLH and outgroup sequences of the bait collection (mandatory)     
+|`--baitsinfo <PATH>`       |BaitsInfo      |Info file defining each bait as bHLH or outgroup sequence (mandatory)           
+|`--optimisedbaits <PATH>`  |OptimisedBaits |Optimised bait collection containing only phylogenetic distinct baits that are used for tree construction (recommended)
+|`--reference <PATH>`       |Reference      |References with alternative name, functional annotation and subfamily (step 4 and 9)
+|`--hmm <PATH>`             |HMM            |HMM motif representing the bHLH domain (step 2 for HMMER search, step 5, and `--filterdomain` option)
+|`--motifs <PATH>`          |Motifs         |HMM motifs of subfamily specific motifs (step 5)                               
+|`--ath <PATH>`             |Ath            |*A. thaliana* sequences used for tree construction (step 7 and 9)
 
 The defined files must meet the following requirements:
 * Baits and OptimisedBaits: All baits, including optimised baits, must be categorized in the BaitsInfo file as ingroup or outgroup sequences.
@@ -134,7 +136,4 @@ Python, dendropy, pandas, numpy, matplotlib, BLAST+, HMMER, MAFFT or MUSCLE5, Fa
 
 ## Reference
 Thoben C. and Pucker B. (2023). Automatic annotation of the bHLH gene family in plants. bioRxiv 2023.05.02.539087; doi: [10.1101/2023.05.02.539087](https://doi.org/10.1101/2023.05.02.539087)
-
-
-
 

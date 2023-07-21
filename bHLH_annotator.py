@@ -12,20 +12,18 @@ import os, glob, sys, subprocess, dendropy, datetime
 from operator import itemgetter
 import math, time
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
+
 try:
 	import hashlib
 except ImportError:
 	pass
 
-__version__ = "v1.03"
+__version__ = "v1.04"
 __usage__ = """
                     python3 bHLH_annotator.py
                     --out <OUTPUT_DIR>
                     --subject <SUBJECT_FILE (peptide,transcript,genomic sequences)> | --subjectdir <SUBJECT_FOLDER_WITH_SEQ_FILES>
                     --info <PATH_TO_CSV_DEFINITION_FILE> | --baits <PATH_TO_BAIT_FILE> --baitsinfo <PATH_TO_BAITS_INFO_FILE>
-                    
                     
                     optional:
                     --search <INITIAL_SEARCH_TOOL>(blast|hmmer)[blast]
@@ -35,7 +33,6 @@ __usage__ = """
                     --cdsinput <CHANGES_EXPECTED_INPUT_TO_CDS>
                     --keepnames <PREVENTS_CUTTING_OF_NAMES_AT_FIRST_SPACE>                    
                     --collapse <REDUCES IN-PARALOGS_TO_ONE_REPRESENTATIVE>
-                    --parameter_graphs<CREATES_GRAPHS_WITH_PARAMETER> 
                     
                     --cpu <NUMBER_OF_THREADS>[4]
                     --cpumax <MAX_CPUs_FOR_IN_OUT_CLASSIFICATION>[cpu]
@@ -102,70 +99,79 @@ def translate( seqs ):
 
 
 def clean_input_FASTA_file( raw_subject_file, subject_file, mapping_table, cds_input, trim_names ):
-    """! @brief clean input FASTA file """
-    
-    forbidden_characters = [ ";", ":", "(", ")", "_", "=" ]
-    
-    with open( mapping_table, "w" ) as out:
-        out.write( "InitialID\tCleanID\n" )
-        sequences = {}
-        with open( raw_subject_file ) as f:
-            header = f.readline()[1:].strip()
-            if trim_names:
-                if " " in header:
-                    header = header.split(' ')[0]
-                    if "\t" in header:
-                        header = header.split('\t')[0]
-            out.write( header + "\t" )
-            if " " in header:
-                header = header.split(' ')[0]
-            if "\t" in header:
-                header = header.split('\t')[0]
-            for each in forbidden_characters:
-                header = header.replace( each, "-" )
-            header = header.encode("ascii", "ignore").decode()    #removal of non-ASCII characters
-            out.write( header + "\n" )
-            seq = []
-            line = f.readline()
-            while line:
-                if line[0] == '>':
-                        sequences.update( { header: "".join( seq ) } )
-                        header = line.strip()[1:]
-                        if trim_names:
-                            if " " in header:
-                                header = header.split(' ')[0]
-                                if "\t" in header:
-                                    header = header.split('\t')[0]
-                        out.write( header + "\t" )
-                        if " " in header:
-                            header = header.split(' ')[0]
-                        if "\t" in header:
-                            header = header.split('\t')[0]
-                        for each in forbidden_characters:
-                            header = header.replace( each, "-" )
-                        header = header.encode("ascii", "ignore").decode()
-                        out.write( header + "\n" )
-                        seq = []
-                else:
-                    seq.append( line.strip() )
-                line = f.readline()
-            sequences.update( { header: "".join( seq ) } )
-    
-    if cds_input:
-        cds_file = subject_file.replace( ".pep.fasta", ".cds.fasta" )
-        pep_sequences = translate( sequences )
-        with open( cds_file, "w" ) as out:    #construct file with clean CDS
-            for key in sequences.keys():
-                out.write( '>' + key + "\n" + sequences[ key ] + "\n" )
-    
-        with open( subject_file, "w" ) as out:    #construct file with clean PEPs
-            for key in pep_sequences.keys():
-                out.write( '>' + key + "\n" + pep_sequences[ key ] + "\n" )
-            
-    else:
-        with open( subject_file, "w" ) as out:    #construct file with clean PEPs
-            for key in sequences.keys():
-                out.write( '>' + key + "\n" + sequences[ key ] + "\n" )
+	"""! @brief clean input FASTA file """
+	
+	forbidden_characters = [ ";", ":", "(", ")", "_", "=" ]
+	tab_replacement = False
+	
+	with open( mapping_table, "w" ) as out:
+		out.write( "InitialID\tCleanID\n" )
+		sequences = {}
+		with open( raw_subject_file ) as f:
+			header = f.readline()[1:].strip()
+			if trim_names:
+				if " " in header:
+					header = header.split(' ')[0]
+					if "\t" in header:
+						header = header.split('\t')[0]
+			if "\t" in header:
+				tab_replacement = True	#set variable to true to trigger warning
+			out.write( header.replace("\t", "   ") + "\t" )
+			if " " in header:
+				header = header.split(' ')[0]
+			if "\t" in header:
+				header = header.split('\t')[0]
+			for each in forbidden_characters:
+				header = header.replace( each, "-" )
+			header = header.encode("ascii", "ignore").decode()	#removal of non-ASCII characters
+			out.write( header + "\n" )
+			seq = []
+			line = f.readline()
+			while line:
+				if line[0] == '>':
+						sequences.update( { header: "".join( seq ) } )
+						header = line.strip()[1:]
+						if trim_names:
+							if " " in header:
+								header = header.split(' ')[0]
+								if "\t" in header:
+									header = header.split('\t')[0]
+						if "\t" in header:
+							tab_replacement = True	#set variable to true to trigger warning
+						out.write( header.replace("\t", "   ") + "\t" )
+						if " " in header:
+							header = header.split(' ')[0]
+						if "\t" in header:
+							header = header.split('\t')[0]
+						for each in forbidden_characters:
+							header = header.replace( each, "-" )
+						header = header.encode("ascii", "ignore").decode()
+						out.write( header + "\n" )
+						seq = []
+				else:
+					seq.append( line.strip() )
+				line = f.readline()
+			sequences.update( { header: "".join( seq ) } )
+	
+	if cds_input:
+		cds_file = subject_file.replace( ".pep.fasta", ".cds.fasta" )
+		pep_sequences = translate( sequences )
+		with open( cds_file, "w" ) as out:	#construct file with clean CDS
+			for key in sequences.keys():
+				out.write( '>' + key + "\n" + sequences[ key ] + "\n" )
+	
+		with open( subject_file, "w" ) as out:	#construct file with clean PEPs
+			for key in pep_sequences.keys():
+				out.write( '>' + key + "\n" + pep_sequences[ key ] + "\n" )
+			
+	else:
+		with open( subject_file, "w" ) as out:	#construct file with clean PEPs
+			for key in sequences.keys():
+				out.write( '>' + key + "\n" + sequences[ key ] + "\n" )
+	
+	if tab_replacement:	#show warning that tabs have been replaced by three spaces
+		sys.stdout.write( "WARNING: tabs in input sequence names have been replaced by three spaces. Please provide input sequences without tabs or spaces in their names.\n" )
+		sys.stdout.flush()
 
 
 def load_sequences( fasta_file ):
@@ -391,7 +397,7 @@ def generate_documentation_file(doc_file,fam_bait_seq_file_all ,fam_bait_seq_fil
                                 search, mode_aln, mode_tree, blastp, makeblastdb, hmmsearch, cpumax ,cpub, cpur, mafft, muscle, raxml, fasttree, ref_file,
                                 bitscore_cutoff_p, similarity_cutoff_p, possibility_cutoff_p, length_cutoff_p, cds_input, 
                                 min_score_cutoff, neighbour_cutoff, mean_factor_cutoff, min_neighbour_cutoff, dist_cutoff_factorB, fam,
-                                filter_domain, parallel_mode, num_process_candidates, name, keepnames, collapse,parameter_graphs):
+                                filter_domain, parallel_mode, num_process_candidates, name, keepnames, collapse):
     """! @brief write documentation file with specified inputs and parameters """
     
     with open( doc_file, "w" ) as out:
@@ -441,7 +447,6 @@ def generate_documentation_file(doc_file,fam_bait_seq_file_all ,fam_bait_seq_fil
         out.write( "Prefix of output file names: " + name + "\n" )
         out.write( "Preventing of splitting sequence names at first space (--keepnames): " + str(keepnames) + "\n" )
         out.write( "Reducing paralogs to one representative (--collapse): " + str(collapse) + "\n" )
-        out.write( "Create graphs for parameter values (--parametergraphs): " + str(parameter_graphs) + "\n" )
         
         # --- paths to tools --- #
         out.write( "blastp path: " + blastp + "\n" )
@@ -508,10 +513,10 @@ def load_BLAST_results( blast_result_file, similarity_cutoff, possibility_cutoff
 			if float( parts[2] ) > similarity_cutoff:	#similarity is sufficient
 				if float( parts[3] ) > length_cutoff:	#substantial part of query is matched
 					if float(parts[-1]) >= bitscore:
-    					 try:
-    						 valid_blast_hits[ parts[1] ].append( { 'gene': parts[0], 'score': float( parts[-1] ) } )
-    					 except KeyError:
-    						 valid_blast_hits.update( { parts[1]: [ { 'gene': parts[0], 'score': float( parts[-1] ) } ] } )
+						try:
+							valid_blast_hits[ parts[1] ].append( { 'gene': parts[0], 'score': float( parts[-1] ) } )
+						except KeyError:
+							valid_blast_hits.update( { parts[1]: [ { 'gene': parts[0], 'score': float( parts[-1] ) } ] } )
 			line = f.readline()
 	
 	# --- reduce BLAST hit number to given number of candidate possibilities ---- #
@@ -527,53 +532,6 @@ def load_BLAST_results( blast_result_file, similarity_cutoff, possibility_cutoff
 	
 	return final_valid_blast_hits
 
-
-def analyze_blast_result(result_folder, blast_result):
-    """! @brief analyzes the number of identified candidates for a variation of blast parameters """
-    if not os.path.isdir(result_folder):
-        os.mkdir(result_folder)
-    
-    data = pd.read_csv( blast_result, delimiter = "\t", header=None)    
-    data["id"] = data[1] #new candidate id
-    data["bit_score"] = data[11]
-    data["length"] = data[3]    
-    data["similarity"] = data[2] 
-    data["hit"] = data[0]
-    data = data.reindex(columns=["id","bit_score","length","similarity","hit"])
-      
-    param_figures = result_folder + "blast_parameter_"
-    for param in ["bit_score","length","similarity"]:        
-        x, y = [], []     
-        for val in range(0,100,10):
-            x.append(val)
-            y.append( len(data[data[param] > val].drop_duplicates(subset="id")))
-        fig = plt.figure()
-        plt.plot(x,y,label=param)
-        plt.xlabel(param)
-        plt.ylabel("number of candidates")
-        plt.tight_layout()
-        plt.savefig(param_figures + param +".jpg",dpi=300)
-        plt.close(fig)
-
-    combined_figures = result_folder + "1_blast_combined_simcutp_"
-    for similarity_cutoff in range(10,100,10):
-        x,y,z = [],[],[] 
-
-        for bitscore in range(0,100,10):
-            for length in range(0,100,10):
-                x.append(bitscore)
-                y.append(length)               
-                z.append(len(data[(data["bit_score"] >= bitscore) & (data["length"] > length) & (data["similarity"]>similarity_cutoff)].drop_duplicates(subset="id")))   
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection="3d")
-        ax.plot_trisurf(np.array(x), np.array(y), np.array(z), alpha = 0.8, cmap = "viridis")
-        ax.set_xlabel("bit_score")
-        ax.set_ylabel("length")
-        ax.set_zlabel("number of candidates")     
-        plt.title("--simcutp: " + str(similarity_cutoff))  
-        plt.tight_layout()
-        plt.savefig(combined_figures + str(int(similarity_cutoff)) +".jpg",dpi=300)
-        plt.close(fig)
 
 def load_hmmsearch_results( seq_search_result_file ):
     """! @brief load all hmmsearch hits into a dictionary """
@@ -840,85 +798,6 @@ def split_into_ingroup_and_outgroup( tree_file, in_list, out_list, neighbour_cut
                 results.update( { t1.label: { "score": 0.0, "in": in_counter, "out": out_counter, "hmm":hmm, "tree":os.path.basename(tree_file)} } )
             #score ranges from 0 (non-family member) to 1 (family member)
     return results
-
-
-def analyze_ingroup_outgroup_result(result_folder, tree_files, in_list, out_list, hmmresult, filter_domains):    
-    """! @brief analyzes the number of classified ingroup candidates for a variation of parameters """
-    
-    neighbours =  range(10,100,10)
-    scores = [r/10 for r in range(1,11)]
-    
-    if not os.path.isdir(result_folder):
-        os.mkdir(result_folder)
-    
-    for dist_factor in [5,10]:  
-        for min_neighbour_cutoff in range(0,11):
-        
-            x, y, z = [], [], []     
-            neighbour_params = result_folder + "2_classification_neighbourdist_%i_minneighbours_%i.jpg" % (int(dist_factor), int(min_neighbour_cutoff))
-            for n in neighbours: 
-                
-                fam_classification = {}
-                for tree_file in tree_files: 
-                    classification = split_into_ingroup_and_outgroup( tree_file, in_list, out_list, n, dist_factor, min_neighbour_cutoff, hmmresult)
-                    fam_classification.update(classification)
-                         
-                for s in scores:    
-                    results = [r for r in fam_classification if fam_classification[r]["score"]>s  and ( r in hmmresult or not filter_domains)] 
-                    x.append(s)    
-                    y.append(n)
-                    z.append(len(results))
-            
-            fig = plt.figure()
-            ax = plt.axes(projection='3d')
-            ax.plot_trisurf(np.array(x), np.array(y),  np.array(z), alpha = 0.8, cmap = 'viridis')
-            ax.set_xlabel('score') 
-            ax.set_ylabel('neighbours')
-            ax.set_zlabel('number of candidates') 
-            plt.title("--neighbourdist: %i --minneighbours: % i" % (int(dist_factor), int(min_neighbour_cutoff)))
-            plt.tight_layout()
-            plt.savefig(neighbour_params,dpi=300)
-            plt.close(fig)
-
-
-def write_tree_symbol(df, field_labels, field_shapes, field_colors, output_file):
-    """! @brief creates an iTol dataset """
-    with open( output_file ,"w") as out: 
-        out.write( "\n".join(["DATASET_BINARY","SEPARATOR COMMA",
-         "DATASET_LABEL,label1",
-         "COLOR,#ff0000",
-         "\n"]))    
-        out.write("FIELD_SHAPES,%s\n" % (",".join(field_shapes)))
-        out.write("FIELD_LABELS,%s\n" % (",".join(field_labels)))
-        out.write("FIELD_COLORS,%s\n" % (",".join(field_colors)))
-        out.write("DATA\n" )    
-        out.write(df.to_csv(index=False,header=False,sep=","))
-
-
-def fam_classification_dataset_file( tree_dataset_file, aln_hmmsearch_results, in_list, out_list, fam_classification , min_score_cutoff, candidates_domain_filter):                    
-    """! @brief creates an iTol dataset to visualize ingroup and outgroup classification """
-    row_list=[]
-    
-    for bait in in_list:
-        missing_domain = "-1" if (bait in aln_hmmsearch_results or len(aln_hmmsearch_results)==0) else "1"
-        row_list.append( {"CleanID":bait,"missing_hmm_domain":missing_domain, "bhlh":1})
-        
-    for bait in out_list:
-        missing_domain = "-1" if (bait in aln_hmmsearch_results or len(aln_hmmsearch_results)==0) else "1"
-        row_list.append( {"CleanID":bait,"bait_out":"1", "missing_hmm_domain":missing_domain, "bhlh":-1})
-        
-    for candidate in fam_classification:
-        missing_domain = "-1" if (candidate in aln_hmmsearch_results or len(aln_hmmsearch_results)==0) else "1"
-        is_ingroup = fam_classification[ candidate ]["score"] > min_score_cutoff and ( candidate in aln_hmmsearch_results or not candidates_domain_filter)
-        cnd_in = "1" if is_ingroup else "-1"
-        
-        if is_ingroup:
-            row_list.append({"CleanID":candidate, "cnd_in":cnd_in ,"missing_hmm_domain":missing_domain,  "bhlh":-1})                              
-
-    data = pd.DataFrame(row_list).fillna(value="-1").reindex(columns=["CleanID","missing_hmm_domain","bait_out","cnd_in","bhlh"])
-    write_tree_symbol(data,data.columns.values[1:], ["3","1","2","2"],["#3d85c6","#bcbcbc","#f44336","	#00ff00"],tree_dataset_file)
- 
-    return tree_dataset_file                    
 
 
 def member_group_assignment( ref_members, tree_file, member_candidates ):
@@ -1265,10 +1144,6 @@ def main( arguments ):
         collapse_mode = True
     else:
         collapse_mode = False
-    if "--parameter_graphs" in arguments:
-        parameter_graphs = True
-    else:
-        parameter_graphs = False
 
     # --- CPU usage --- #
     if "--cpu" in arguments:
@@ -1494,7 +1369,7 @@ def main( arguments ):
                                     search, mode_aln ,mode_tree, blastp, makeblastdb,hmmsearch, cpu_max ,cpub, cpur, mafft, muscle,raxml, fasttree, ref_file,
                                     bitscore_p, similarity_cutoff_p, possibility_cutoff_p, length_cutoff_p, cds_input,
                                     min_score_cutoff,neighbour_cutoff, mean_factor_cutoff, min_neighbour_cutoff, dist_cutoff_factorB, fam,
-                                    candidates_domain_filter, parallel_mode, num_process_candidates, name, trim_names, collapse_mode, parameter_graphs)        
+                                    candidates_domain_filter, parallel_mode, num_process_candidates, name, trim_names, collapse_mode)        
         start_time = datetime.datetime.now()   
         
         
@@ -1514,9 +1389,7 @@ def main( arguments ):
                 p.communicate()
         
         if search == "blast":
-            seq_search_results = load_BLAST_results( seq_search_result_file, similarity_cutoff_p, possibility_cutoff_p, length_cutoff_p ,bitscore_p)    #load valid BLASTp results
-            if parameter_graphs:
-                analyze_blast_result(blast_analyze_folder, seq_search_result_file)            
+            seq_search_results = load_BLAST_results( seq_search_result_file, similarity_cutoff_p, possibility_cutoff_p, length_cutoff_p ,bitscore_p)    #load valid BLASTp results           
         else:
             seq_search_results = load_hmmsearch_results( seq_search_result_file )    #load valid hmmsearch results
         
@@ -1587,15 +1460,6 @@ def main( arguments ):
                                                                     ] ) ) ) + "\n" )
                         if fam_classification[ candidate ]["score"] > min_score_cutoff and ( candidate in aln_hmmsearch_results or not candidates_domain_filter):                            
                             out.write( ">" + candidate + "\n" + subject_sequences[ candidate ] + "\n" )
-            
-            # create analysis of candidate number for parameter variation
-            classification_analyze_folder = job_output_folder +"02_first_in_out_analysis/"                
-            if parameter_graphs:
-                analyze_ingroup_outgroup_result(classification_analyze_folder, tree_files, in_list, out_list, aln_hmmsearch_results, candidates_domain_filter)                 
-            
-            # create tree dataset file in iTOL format
-            tree_dataset_file = tree_output_folder + "first_tree_info_dataset.txt"               
-            fam_classification_dataset_file( tree_dataset_file, aln_hmmsearch_results, in_list, out_list, fam_classification , min_score_cutoff, candidates_domain_filter)
                     
         # --- 02 second classification: 
         clean_members_file_s =  tree_output_folder + name + "second_clean_%ss.pep.fasta" % (fam)
@@ -1630,15 +1494,6 @@ def main( arguments ):
                                                                     ] ) ) ) + "\n" )
                         if fam_classification[ candidate ]["score"] > min_score_cutoff and ( candidate in aln_hmmsearch_results or not candidates_domain_filter):                            
                             out.write( ">" + candidate + "\n" + subject_sequences[ candidate ] + "\n" )
-
-            # create analysis of candidate number for parameter variation
-            classification_analyze_folder = job_output_folder +"02_second_in_out_analysis/"                
-            if parameter_graphs:
-                analyze_ingroup_outgroup_result(classification_analyze_folder, tree_files, in_list, out_list, aln_hmmsearch_results, candidates_domain_filter) 
-
-            # create tree dataset file in iTOL format
-            tree_dataset_file = tree_output_folder + "second_tree_info_dataset.txt"               
-            fam_classification_dataset_file( tree_dataset_file, aln_hmmsearch_results, in_list, out_list, fam_classification , min_score_cutoff, candidates_domain_filter)
             
             # final candidate file
             p = subprocess.Popen( args= "cp " +  clean_members_file_s + " " +  clean_members_file, shell=True )         

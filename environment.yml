@@ -10,7 +10,6 @@ dependencies:
   - mafft
   - matplotlib
   - muscle
-  - numpy
   - pandas
   - python
   - raxml-ng
