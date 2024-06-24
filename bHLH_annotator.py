@@ -402,6 +402,7 @@ def generate_documentation_file(doc_file,fam_bait_seq_file_all ,fam_bait_seq_fil
     
     with open( doc_file, "w" ) as out:
 
+        out.write( "Please cite 'Thoben C. and Pucker B. (2023). Automatic annotation of the bHLH gene family in plants. BMC Genomics 24, 780 (2023). doi: 10.1186/s12864-023-09877-2' when using bHLH_annotator.py.\n\n" )
         out.write( "bHLH_annotator.py version: " + __version__ + "\n" )
         fam_bait_seq_file_md5 = md5_calculator( fam_bait_seq_file_all )
         out.write( fam + " bait file: " + fam_bait_seq_file_all + "\t" + fam_bait_seq_file_md5 + "\n" )
