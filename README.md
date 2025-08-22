@@ -19,7 +19,7 @@ The initial candidates are sorted out based on their phylogenetic relationship t
 
 For large datasets like *de novo* transcriptome assemblies, the collapse option is recommended (**step 8 and 9**) which collapses paralogous groups by defining a representative candidate. The parallel option is also recommenced to reduce the pipeline runtime and consumption of memory resources during classification.
 
-The data files used in each step can be customised by the user to allow an investigation suiting the own research purpose (described below). A more detailed description of the pipeline and the bait collection can be found [here](https://doi.org/10.1101/2023.05.02.539087). 
+The data files used in each step can be customised by the user to allow an investigation suiting the own research purpose (described below). A more detailed description of the pipeline and the bait collection can be found [here](https://doi.org/10.1186/s12864-023-09877-2). 
 
 ## Setup
 
