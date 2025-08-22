@@ -29,7 +29,7 @@ The easiest way for installation is by creating an conda environment with the de
 git clone https://github.com/bpucker/bHLH_annotator
 cd bHLH_annotator
 conda env create -f environment.yml
-conda activate bHLH_annotator
+conda activate bhlh_annotator
 ```
 ### Manual installation of the dependencies
 The following dependencies are necessary for the execution of the pipeline:
