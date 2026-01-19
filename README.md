@@ -61,7 +61,7 @@ The pipeline is executed through the following command:
 cd <PATH>/bHLH_annotator
 python3 bHLH_annotator.py --subject <PATH> --out <OUTPUT> --info <DEFINITION_FILE>
 ```
-The ```--subject``` file defines the path to the input FASTA file containing coding or peptide sequences. The output directory is defined with the ```--out``` command. In the output directory, a RESULT folder is created containing the output files created in the pipeline steps. The ```--info``` file represents the bHLH_annotator.csv. This file is necessary as it defines the input data files utilized in the pipeline.  
+The ```--subject``` file defines the path to the input FASTA file containing coding or peptide sequences. Instead of ```--subject```, the ```--subjectdir``` option can be used to define a path to a directory containing multiple input FASTA files. The output directory is defined with the ```--out``` command. In the output directory, a RESULT folder is created containing the output files created in the pipeline steps. The ```--info``` file represents the bHLH_annotator.csv. This file is necessary as it defines the input data files utilized in the pipeline.  
 
 #### Optional arguments regarding subject file
 |Command|Description|Default
