@@ -4,6 +4,15 @@
 ###  &rarr; bHLH_annotator is also available on the [BioInfToolServer](https://pbb-tools.de/bHLH_annotator/)
 
 
+<a href="https://www.pbb.uni-bonn.de">
+<img alt="de.NBI logo" src="https://github.com/bpucker/KIPEs/blob/master/deNBI_Logo_rgb_Rand.jpg?raw=true"  width="600">
+</a>  
+
+This is an approved de.NBI service. Help us improve by completing our [short user survey](https://www.surveymonkey.de/r/denbi-service?sc=associatedpartner&tool=bHLH_annotator).
+
+
+
+
 The bHLH_annotator allows the automatic identification and functional annotation of the bHLH transcription factor family in novel plant sequence data sets.  Coding sequences or peptide sequences derived from a de novo genome and transcriptome assembly can be analyzed with this pipeline. 
 
 A phylogenetic approach is performed for the annotation of the candidates, based on a [bait collection](https://github.com/bpucker/bHLH_annotator/blob/main/supplements/) of bHLHs and outgroup sequences (non-bHLHs with a high sequence similarity to bHLHs):   
